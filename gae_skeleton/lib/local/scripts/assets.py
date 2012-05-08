@@ -183,7 +183,7 @@ def build(debug=True, cache=True):
     log = _load_logger()
     cmdenv = CommandLineEnvironment(env, log)
 
-    cmdenv.build()
+    cmdenv.rebuild()
 
 def watch(debug=False, cache=False):
     env = _setup_env(debug, cache)
