@@ -62,16 +62,17 @@ class Transaction(ndb.Model):
             return
 
         work = []
-        for tag in self.tags:
-            task_name = "%s:%s:%s" % (tag, self.key.urlsafe, self.revision)
+        for tag_data in self.tags:
+            tag = tag_data['name']
+            task_name = "%s_%s_%s" % (tag, self.key.urlsafe(), self.revision)
             work.append(taskqueue.Task(
                 method='PULL',
                 name=task_name,
                 tag=tag,
                 payload=json.dumps({
-                    'entity': self.key.urlsafe,
+                    'entity': self.key.urlsafe(),
                     'rev': self.revision,
-                    'date': self.date.strptime('%Y%m%d%H:%M'),
+                    'date': self.date.strftime('%Y%m%d%H:%M'),
                     'amount': self.amount,
                     'namespace': namespace_manager.get_namespace()
                 }),
@@ -95,7 +96,7 @@ class Transaction(ndb.Model):
 
         # TODO: Fix date processing.
         transaction.date = datetime.strptime(data.get('date'), '%m/%d/%Y')
-        transaction.vendor = data.get('vendor')
+        transaction.vendor_name = data.get('vendor')
 
         # TODO: Use Python Decimal here with prec set to .00.
         transaction.amount = data.get('amount')
