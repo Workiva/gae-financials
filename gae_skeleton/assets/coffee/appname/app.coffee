@@ -37,6 +37,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         "click .add-button": "add"
 
     render: =>
+        @searchMode = true
         App.Appname.Events.bind(@modelType.name + ":add", @addItem, this)
         App.Appname.Events.bind(@modelType.name + ":edit", @editItem, this)
 
@@ -49,6 +50,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         return this
 
     editItem: (model) =>
+        @addClose()
         App.Appname.Events.bind(@modelType.name + ":save", this.editSave, this)
         @editView = new @form({model: model})
         el = @editView.render(true).$el
@@ -78,6 +80,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         $("#add_new").text('Search Mode')
 
     addClose: =>
+        App.Appname.Events.unbind(@modelType.name + ":save", this.addSave, this)
         @searchMode = true
         if @addView
             @addView.close()
