@@ -75,6 +75,39 @@ class Transaction(ndb.Model):
         taskqueue.Queue(name='work-groups').add(work)
 
     @classmethod
+    def normalize_date_input(cls, input):
+        from time import mktime
+        from datetime import datetime
+        import parsedatetime.parsedatetime as pdt
+
+        c = pdt.Calendar()
+        result, what = c.parse(input)
+
+        dt = None
+
+        # what was returned (see http://code-bear.com/code/parsedatetime/docs/)
+        # 0 = failed to parse
+        # 1 = date (with current time, as a struct_time)
+        # 2 = time (with current date, as a struct_time)
+        # 3 = datetime
+        if what in (1,2):
+            # result is struct_time
+            dt = datetime(*result[:6])
+        elif what == 3:
+            # result is a datetime
+            dt = result
+
+        if dt is None:
+            try:
+                c.parseDate(input)
+            except ValueError:
+                dt = None
+
+        return dt
+
+
+
+    @classmethod
     def from_dict(cls, data):
         """Instantiate a Transaction entity from a dict of values."""
         from datetime import datetime
@@ -90,8 +123,8 @@ class Transaction(ndb.Model):
             transaction = cls()
 
         # TODO: Fix date processing.
-        transaction.date = datetime.strptime(data.get('date'), '%m/%d/%Y')
-        transaction.vendor = data.get('vendor')
+        transaction.date = cls.normalize_date_input(data.get('date'))
+        transaction.vendor_name = data.get('vendor')
 
         # TODO: Use Python Decimal here with prec set to .00.
         transaction.amount = data.get('amount')
@@ -115,7 +148,7 @@ class Transaction(ndb.Model):
             'modified': self.modified.strftime('%Y-%m-%d %h:%M'),
 
             # date
-            'date': self.date.strftime('%m/%d/%Y'),
+            'date': self.date.strftime('%m/%d/%Y') if self.date is not None else None,
 
             # vendor
             'vendor': self.vendor_name,
