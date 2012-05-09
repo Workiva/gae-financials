@@ -1,0 +1,9 @@
+assets/.webassets-cache
+*.pyc
+.ropeproject
+static/script
+static/css
+*.ds
+*.swp
+.DS_Store
+
