@@ -86,9 +86,8 @@ class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
                         typeahead.process(data)
                 })
         })
-        if as_modal
-            el.attr('class', 'modal')
-        return this
+
+        return super(as_modal)
 
     save: =>
         console.log(

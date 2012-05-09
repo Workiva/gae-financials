@@ -1,26 +1,33 @@
 <form class="edit containter-fluid well form-horizontal">
     <div class="row-fluid">
-        <fieldset>
-            <div class="control-group">
-                <label for="date" class="control-label">Date:</label>
-                <div class="control">
-                    <input type="text" value="<%= date %>" id="date" class="date" />
+        <div id="editheadercontainer" class="modal-header">
+            <h3 id="editheader">Transaction<h3>
+        </div>
+        <div class="modal-body">
+            <fieldset>
+                <div class="control-group">
+                    <label for="date" class="control-label">Date:</label>
+                    <div class="control">
+                        <input type="text" value="<%= date %>" id="date" class="date" />
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <label for="vendor" class="control-label">Vendor:</label>
-                <div class="control">
-                    <input type="text" value="<%= vendor %>" id="vendor" class="vendor" />
+                <div class="control-group">
+                    <label for="vendor" class="control-label">Vendor:</label>
+                    <div class="control">
+                        <input type="text" value="<%= vendor %>" id="vendor" class="vendor" />
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <label for="vendor" class="control-label">Amount:</label>
-                <div class="control">
-                    <input type="text" value="<%= amount %>" id="amount" class="amount" />
+                <div class="control-group">
+                    <label for="vendor" class="control-label">Amount:</label>
+                    <div class="control">
+                        <input type="text" value="<%= amount %>" id="amount" class="amount" />
+                    </div>
                 </div>
-            </div>
-        </fieldset>
-        <a class="save btn btn-primary">Save</a>
-        <a class="remove-button btn btn-danger">Clear</a>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <a class="save btn btn-primary">Save</a>
+            <a class="remove-button btn btn-danger">Clear</a>
+        </div>
     </div>
 </form>
