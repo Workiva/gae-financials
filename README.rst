@@ -33,4 +33,4 @@ To run the local server: ::
     $ fab run
 or ::
 
-    $ fab run:port=8888
+    $ fab run:args=-p8888
