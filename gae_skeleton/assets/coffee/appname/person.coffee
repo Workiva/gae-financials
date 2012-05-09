@@ -91,10 +91,12 @@ class App.Appname.Views.PersonEdit extends App.Appname.Views.EditView
         editView = new App.Appname.Views.ContactInfoEdit({model: newModel})
         @$el.find('fieldset.contact_info').append(editView.render().el)
 
+
 class App.Appname.Views.PersonApp extends App.Appname.Views.ModelApp
     template: JST['person/view']
     modelType: App.Appname.Models.Person
     form: App.Appname.Views.PersonEdit
+
 
 class App.Appname.Views.PersonList extends App.Appname.Views.ListView
     template: JST['person/list']
