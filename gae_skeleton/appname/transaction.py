@@ -55,6 +55,7 @@ class Transaction(ndb.Model):
         """Ran after the entity is written to the datastore."""
         import json
         from google.appengine.api import taskqueue
+        from google.appengine.api import namespace_manager
 
         if not self.tags:
             return
@@ -63,12 +64,15 @@ class Transaction(ndb.Model):
         for tag in self.tags:
             task_name = "%s:%s:%s" % (tag, self.key.urlsafe, self.revision)
             work.append(taskqueue.Task(
+                method='PULL',
                 name=task_name,
                 tag=tag,
                 payload=json.dumps({
                     'entity': self.key.urlsafe,
                     'rev': self.revision,
-                    'payload': self.amount
+                    'date': self.date.strptime('%Y%m%d%H:%M'),
+                    'amount': self.amount,
+                    'namespace': namespace_manager.get_namespace()
                 }),
             ))
         taskqueue.Queue(name='work-groups').add(work)
