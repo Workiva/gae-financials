@@ -51,39 +51,6 @@ class App.Appname.Collections.PersonList extends Backbone.Collection
     model: App.Appname.Models.Person
 
 
-
-
-class App.Appname.Views.PersonList extends Backbone.View
-    template: JST['person/list']
-    tagName: "tr"
-
-    events:
-        "click .edit-button": "edit"
-        "click .remove-button": "clear"
-
-    initialize: =>
-        @model.bind('change', @render, this)
-        @model.bind('destroy', @remove, this)
-
-    render: =>
-        @$el.html(@template(@model.toJSON()))
-        return this
-
-    edit: =>
-        @editView = new App.Appname.Views.PersonEdit({model: @model})
-        @editView.on("save", this.save, this)
-        el = @editView.render(true).$el
-        el.modal('show')
-        el.find('input.code').focus()
-
-    save: (model) =>
-        @editView.$el.modal('hide')
-        @editView.close()
-
-    clear: =>
-        @model.clear()
-
-
 class App.Appname.Views.PersonEdit extends Backbone.View
     template: JST['person/edit']
     tagName: "div"
@@ -117,7 +84,7 @@ class App.Appname.Views.PersonEdit extends Backbone.View
             name: @$('input.name').val()
             notes: $.trim(@$('textarea.notes').val())
         )
-        this.trigger('save', @model)
+        App.Appname.Events.trigger('Person:save', @model)
 
     addContactInfo: () =>
         newModel = new @model.contact_info.model()
@@ -134,3 +101,20 @@ class App.Appname.Views.PersonApp extends App.Appname.Views.ModelApp
     template: JST['person/view']
     modelType: App.Appname.Models.Person
     form: App.Appname.Views.PersonEdit
+
+class App.Appname.Views.PersonList extends App.Appname.Views.ListView
+    template: JST['person/list']
+    modelType: App.Appname.Models.Person
+
+    #edit: =>
+        #@editView = new App.Appname.Views.PersonEdit({model: @model})
+        #@editView.on("save", this.save, this)
+        #el = @editView.render(true).$el
+        #el.modal('show')
+        #el.find('input.code').focus()
+
+    #save: (model) =>
+        #@editView.$el.modal('hide')
+        #@editView.close()
+
+
