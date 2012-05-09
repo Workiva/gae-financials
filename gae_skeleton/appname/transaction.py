@@ -118,7 +118,7 @@ class Transaction(ndb.Model):
             'date': self.date.strftime('%m/%d/%Y'),
 
             # vendor
-            'vendor_name': self.vendor_name,
+            'vendor': self.vendor_name,
 
             # amount
             'amount': self.amount,
