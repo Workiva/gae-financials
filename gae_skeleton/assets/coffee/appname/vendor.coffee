@@ -65,13 +65,15 @@ class App.Appname.Views.VendorEdit extends App.Appname.Views.EditView
     render: (as_modal) =>
         el = @$el
         el.html(@template(@model.toJSON()))
+
         @model.tags.each((info, i) ->
             editView = new App.Appname.Views.TagEdit({model: info})
             el.find('fieldset.tags').append(editView.render().el)
         )
         if as_modal
             el.attr('class', 'modal')
-        return this
+
+        return super(as_modal)
 
     save: =>
         @model.tags.each((tag) ->

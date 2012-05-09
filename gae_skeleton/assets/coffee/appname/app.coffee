@@ -37,6 +37,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         "click .add-button": "add"
 
     render: =>
+        @searchMode = true
         App.Appname.Events.bind(@modelType.name + ":add", @addItem, this)
         App.Appname.Events.bind(@modelType.name + ":edit", @editItem, this)
 
@@ -49,6 +50,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         return this
 
     editItem: (model) =>
+        @addClose()
         App.Appname.Events.bind(@modelType.name + ":save", this.editSave, this)
         @editView = new @form({model: model})
         el = @editView.render(true).$el
@@ -78,6 +80,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         $("#add_new").text('Search Mode')
 
     addClose: =>
+        App.Appname.Events.unbind(@modelType.name + ":save", this.addSave, this)
         @searchMode = true
         if @addView
             @addView.close()
@@ -110,9 +113,24 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 class App.Appname.Views.EditView extends Backbone.View
     tagName: "div"
     modelType: null
+    is_modal: false
 
     clear: =>
         @model.clear()
+
+    render: (as_modal) =>
+        header = this.$("#editheader")
+
+        if as_modal
+            @$el.attr('class', 'modal')
+
+            this.$("#editheadercontainer").prepend(
+                $("<button class='close' data-dismiss='modal'>&times;</button>"))
+            header.html("Edit " + header.text())
+        else
+            header.html("Add " + header.text())
+
+        return this
 
     save: =>
         App.Appname.Events.trigger(@modelType.name + ':save', @model, this)
