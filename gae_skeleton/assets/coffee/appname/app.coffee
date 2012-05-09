@@ -24,50 +24,125 @@ class App.Appname.Views.App extends Backbone.View
         @$el.html('')
 
 
-class App.Appname.Views.AddApp extends App.Appname.Views.App
+class App.Appname.Views.ModelApp extends App.Appname.Views.App
+    template: null
     modelType: null
-    addForm: null
-    view: null
+    form: null
+    addView: null
+    editView: null
+    listView: null
+    searchMode: true
 
     events:
         "click .add-button": "add"
 
-    initialize: (modelType, form) =>
-        @modelType = modelType
-        @addForm = form
+    render: =>
+        App.Appname.Events.bind(@modelType.name + ":add", @addItem, this)
+        App.Appname.Events.bind(@modelType.name + ":edit", @editItem, this)
 
+        @$el.html(@template())
+
+        @listView = new App.Appname.Views.ListApp(
+            @modelType.name + "List", @$("#" + @modelType.name + "list"))
+
+        $("#add_new").focus()
+        return this
+
+    editItem: (model) =>
+        App.Appname.Events.bind(@modelType.name + ":save", this.editSave, this)
+        @editView = new @form({model: model})
+        el = @editView.render(true).$el
+        el.modal('show')
+        el.find('input.code').focus()
+
+    addItem: (model) =>
+        @listView.addOne(model)
+    
     add: =>
-        if @view
-            @addClose()
-        else
+        if @searchMode
             @addOpen()
+        else
+            @addClose()
 
     addOpen: =>
+        @searchMode = false
+        App.Appname.Events.bind(@modelType.name + ":save", this.addSave, this)
+
         @model = new @modelType()
-        @view = new @addForm({model: @model})
-        @view.on("save", this.save, this)
-        el = @view.render().el
+        @addView = new @form({model: @model})
+
+        el = @addView.render().el
         $("#add_area").html(el)
             .find('input.code').focus()
+
         $("#add_new").text('Search Mode')
 
     addClose: =>
-        @view.onClose = null
-        @view.close()
-        @view = null
+        @searchMode = true
+        if @addView
+            @addView.close()
+        @addView = null
         this.$("#add_new").text('Add Mode')
                           .focus()
 
-    save: (model) =>
-        valid = @view.model.isValid()
+    addSave: (model) =>
+        valid = @addView.model.isValid()
         if valid
-            this.trigger('addItem', model)
-            @view = null
+            App.Appname.Events.trigger(@modelType.name + ':add', model)
+            @addView = null
             @add()
 
+    editSave: (model) =>
+        App.Appname.Events.unbind(@modelType.name + ":save", this.editSave, this)
+        @editView.$el.modal('hide')
+        @editView.close()
+        @editView = null
+
     onClose: =>
-        if @view
-            @view.close()
+        App.Appname.Events.unbind(null, null, this)
+
+        if @addView
+            @addView.close()
+        if @editView
+            @editView.close()
+
+
+class App.Appname.Views.EditView extends Backbone.View
+    tagName: "div"
+    modelType: null
+
+    clear: =>
+        @model.clear()
+
+    save: =>
+        App.Appname.Events.trigger(@modelType.name + ':save', @model, this)
+
+    updateOnEnter: (e) =>
+        if e.keyCode == 13
+            @save()
+
+
+class App.Appname.Views.ListView extends Backbone.View
+    tagName: "tr"
+    modelType: null
+
+    events:
+        "click .edit-button": "edit"
+        "click .remove-button": "clear"
+
+    initialize: =>
+        @model.bind('change', @render, this)
+        @model.bind('destroy', @remove, this)
+
+    render: =>
+        @$el.html(@template(@model.toJSON()))
+        return this
+
+    edit: =>
+        App.Appname.Events.trigger(@modelType.name + ":edit", @model, this)
+
+    clear: =>
+        @model.clear()
 
 
 class App.Appname.Views.ListApp extends App.Appname.Views.App

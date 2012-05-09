@@ -53,7 +53,7 @@ class PersonHandler(webapp2.RequestHandler):
             return
 
         key = ndb.Key(urlsafe=urlsafe)
-        if key.kind != Person._get_kind():
+        if key.kind() != Person._get_kind():
             self.error(500)
             return
 
@@ -112,7 +112,7 @@ class VendorHandler(webapp2.RequestHandler):
             return
 
         key = ndb.Key(urlsafe=urlsafe)
-        if key.kind != Vendor._get_kind():
+        if key.kind() != Vendor._get_kind():
             self.error(500)
             return
 
@@ -166,7 +166,7 @@ class TransactionHandler(webapp2.RequestHandler):
             return
 
         key = ndb.Key(urlsafe=urlsafe)
-        if key.kind != Transaction._get_kind():
+        if key.kind() != Transaction._get_kind():
             self.error(500)
             return
 
