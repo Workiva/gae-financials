@@ -36,6 +36,8 @@ fix_sys_path()
 
 sys.path.extend(paths)
 
+print sys.path
+
 import gaetest as unittest
 
 
@@ -47,13 +49,13 @@ stub_config = {
 }
 
 
-def run(args):
+def run():
     parser = argparse.ArgumentParser(description='Run tests')
     parser.add_argument('tests', nargs='?', default='', help="The path to the tests")
     parser.add_argument('--failfast', action='store_true', default=False)
     parser.add_argument('--verbosity', '-v', type=int, default=1)
 
-    args = parser.parse_args(args)
+    args = parser.parse_args()
 
     suite = _build_suite(args.tests)
 

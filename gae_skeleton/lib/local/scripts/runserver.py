@@ -20,6 +20,7 @@
 import os
 import sys
 
+import argparse
 
 CURRENT_PATH = os.getcwdu()
 
@@ -34,7 +35,18 @@ fix_sys_path()
 sys.path.extend(paths)
 
 
-def run(port, address):
+def run():
+    parser = argparse.ArgumentParser(description='Run tests')
+    parser.add_argument(
+        '--port', '-p', type=int, default=8001)
+    parser.add_argument('--address', '-a', default='localhost')
+
+    args = parser.parse_args()
+
+    start(args.port, args.address)
+
+
+def start(port, address):
     """
     Starts the appengine dev_appserver program.
 
@@ -42,9 +54,6 @@ def run(port, address):
     special parameters, run dev_appserver.py manually.
     """
     from google.appengine.tools import dev_appserver_main
-
-    #hack __main__ so --help in dev_appserver_main works OK.
-    sys.modules['__main__'] = dev_appserver_main
 
     args = [
         '--address', address,
@@ -60,5 +69,15 @@ def run(port, address):
     ]
 
     # Append the current working directory to the arguments.
-    dev_appserver_main.main([sys.argv[0]] + args + [os.getcwdu()])
+    run_args = [None]
+    run_args.extend(args)
+    run_args.append(CURRENT_PATH)
 
+    sys.modules['__main__'] = dev_appserver_main
+    #hack __main__ so --help in dev_appserver_main works OK.
+
+    dev_appserver_main.main(run_args)
+
+
+if __name__ == '__main__':
+    run()

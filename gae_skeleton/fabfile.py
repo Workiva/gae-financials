@@ -21,10 +21,7 @@ import sys
 
 from fabric.api import local
 
-DIR_PATH = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-
-sys.path.append(DIR_PATH)
-sys.path.append(os.path.join(DIR_PATH, 'lib', 'local', 'scripts'))
+sys.path.append(os.path.join('lib', 'local', 'scripts'))
 
 
 def dev():
@@ -39,15 +36,15 @@ def build():
 def cleanpy():
     local('find . -name "*.pyc" -delete')
 
-def test(args='', run_javascript=True):
-    import test_runner
-    test_runner.run(args)
+def test(args='', python='python', run_javascript=True):
+    path = os.path.join('lib', 'local', 'scripts', 'test_runner.py')
+    local('%s %s %s' % (python, path, args))
     if run_javascript:
         local('cd assets; mocha --compilers coffee:coffee-script')
 
-def run(port='8080', address='localhost'):
-    import runserver
-    runserver.run(port, address)
+def run(args='', python='python'):
+    path = os.path.join('lib', 'local', 'scripts', 'runserver.py')
+    local('%s %s %s' % (python, path, args))
 
 def install_assets(node_location=''):
     pass
