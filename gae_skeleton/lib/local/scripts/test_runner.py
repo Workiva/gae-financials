@@ -36,8 +36,6 @@ fix_sys_path()
 
 sys.path.extend(paths)
 
-print sys.path
-
 import gaetest as unittest
 
 
