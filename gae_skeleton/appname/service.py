@@ -144,3 +144,57 @@ class VendorHandler(webapp2.RequestHandler):
         out = vendor_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
+
+class TransactionHandler(webapp2.RequestHandler):
+    def get(self):
+        from appname.transaction import Transaction
+        limit = int(self.request.get('limit', 10))
+
+        query = Transaction.query()
+
+        if limit > 0:
+            query = query.fetch(limit)
+
+        out = [entity.to_dict() for entity in query]
+        self.response.out.write(json.dumps(out))
+
+    def delete(self):
+        from google.appengine.ext import ndb
+        from appname.transaction import Transaction
+        urlsafe = self.request.path.rsplit('/', 1)[-1]
+        if not urlsafe:
+            return
+
+        key = ndb.Key(urlsafe=urlsafe)
+        if key.kind != Transaction._get_kind():
+            self.error(500)
+            return
+
+        key.delete()
+        logging.info("Deleted transaction with key: %s", urlsafe)
+
+    def post(self):
+        self.process()
+
+    def put(self):
+        self.process()
+
+    def process(self):
+        from voluptuous import Schema
+        from appname.transaction import Transaction
+        from appname.transaction import transaction_schema
+
+        transaction = json.loads(self.request.body)
+        schema = Schema(transaction_schema, extra=True)
+        try:
+            schema(transaction)
+        except:
+            logging.exception('validation failed')
+            logging.info(transaction)
+
+        transaction_entity = Transaction.from_dict(transaction)
+        transaction_entity.put()
+
+        out = transaction_entity.to_dict()
+        self.response.out.write(json.dumps(out))
+

@@ -32,6 +32,7 @@ import webapp2
 url_map = [
     ('.*/person.*', 'appname.service.PersonHandler'),
     ('.*/vendor.*', 'appname.service.VendorHandler'),
+    ('.*/transaction.*', 'appname.service.TransactionHandler'),
 ]
 
 app = webapp2.WSGIApplication(url_map)

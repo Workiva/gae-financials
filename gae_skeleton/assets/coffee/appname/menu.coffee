@@ -54,6 +54,11 @@ class App.Appname.Views.Menu extends Backbone.View
                 title: 'vendor',
                 href: '#\/vendor'
             },
+            {
+                text: 'Transaction',
+                title: 'transaction',
+                href: '#\/transaction'
+            },
         ]
         @collection = new App.Appname.Collections.MenuItems(items)
         @collection.bind('change', @render, this)
