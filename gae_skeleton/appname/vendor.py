@@ -55,6 +55,7 @@ class Vendor(ndb.Model):
     @classmethod
     def from_dict(cls, data):
         """Instantiate a Vendor entity from a dict of values."""
+        import base64
         key = data.get('key')
         vendor = None
         if key:
@@ -62,7 +63,9 @@ class Vendor(ndb.Model):
             vendor = key.get()
 
         if not vendor:
-            vendor = cls()
+            vendor_keyname = base64.b64encode(data.get('name'))
+            vendor_key = ndb.Key(cls, vendor_keyname)
+            vendor = cls(key=vendor_key)
 
         vendor.name = data.get('name')
         vendor.tags = data.get('tags')

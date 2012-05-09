@@ -17,6 +17,7 @@
 
 """Transaction model definition and business logic."""
 
+import base64
 from google.appengine.ext import ndb
 
 transaction_schema = {
@@ -40,7 +41,7 @@ class Transaction(ndb.Model):
 
     # Transaction date
     date = ndb.DateTimeProperty('d', indexed=False)
-    vendor = ndb.StringProperty('v', indexed=False)
+    vendor_name = ndb.StringProperty('v', indexed=False)
     amount = ndb.StringProperty('a', indexed=False)
     #v_ = ndb.ComputedProperty(lambda self: self.vendor.lower())
 
@@ -95,7 +96,8 @@ class Transaction(ndb.Model):
         # TODO: Use Python Decimal here with prec set to .00.
         transaction.amount = data.get('amount')
 
-        vendor = Vendor.get_by_id(transaction.vendor)
+        vendor_keyname = base64.b64encode(transaction.vendor_name)
+        vendor = Vendor.get_by_id(vendor_keyname)
         if vendor:
             transaction.tags = vendor.tags
 
@@ -116,7 +118,7 @@ class Transaction(ndb.Model):
             'date': self.date.strftime('%m/%d/%Y'),
 
             # vendor
-            'vendor': self.vendor,
+            'vendor': self.vendor_name,
 
             # amount
             'amount': self.amount,
