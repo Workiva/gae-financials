@@ -51,36 +51,11 @@ class App.Appname.Collections.PersonList extends Backbone.Collection
     model: App.Appname.Models.Person
 
 
-class App.Appname.Views.PersonApp extends App.Appname.Views.App
-    template: JST['person/view']
-    addView: null
-    listView: null
-
-    render: =>
-        @$el.html(@template())
-
-        @listView = new App.Appname.Views.ListApp(
-            'PersonList', this.$("#personlist"))
-        @addView = new App.Appname.Views.AddApp(
-            App.Appname.Models.Person, App.Appname.Views.PersonEdit)
-
-        @addView.on("addItem", this.addPerson, this)
-
-        $("#add_new").focus()
-        return this
-
-    addPerson: (model) =>
-        @listView.addOne(model)
-
-    onClose: =>
-        @addView.close()
-        @listView.close()
 
 
 class App.Appname.Views.PersonList extends Backbone.View
     template: JST['person/list']
     tagName: "tr"
-    editView: null
 
     events:
         "click .edit-button": "edit"
@@ -155,3 +130,7 @@ class App.Appname.Views.PersonEdit extends Backbone.View
         if e.keyCode == 13
             @save()
 
+class App.Appname.Views.PersonApp extends App.Appname.Views.ModelApp
+    template: JST['person/view']
+    modelType: App.Appname.Models.Person
+    form: App.Appname.Views.PersonEdit

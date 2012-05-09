@@ -45,15 +45,15 @@ OUTPUT_FILES = path.join(os.getcwdu(), 'static')
 def _bundle_app_coffee(env, debug=False):
     """Compile the apps coffeescript and bundle it into appname.js"""
     COFFEE_PATH = 'coffee'
-    DISPATCH_PATH = path.join(COFFEE_PATH, 'appname')
+    APP_PATH = path.join(COFFEE_PATH, 'appname')
     scripts = (
         path.join(COFFEE_PATH, 'nested.coffee'),
         path.join(COFFEE_PATH, 'app.coffee'),
-        path.join(DISPATCH_PATH, 'app.coffee'),
-        path.join(DISPATCH_PATH, 'menu.coffee'),
-        path.join(DISPATCH_PATH, 'contact.coffee'),
-        path.join(DISPATCH_PATH, 'person.coffee'),
-        path.join(DISPATCH_PATH, 'router.coffee'),
+        path.join(APP_PATH, 'app.coffee'),
+        path.join(APP_PATH, 'menu.coffee'),
+        path.join(APP_PATH, 'contact.coffee'),
+        path.join(APP_PATH, 'person.coffee'),
+        path.join(APP_PATH, 'router.coffee'),
     )
     all_js = Bundle(
         *scripts,

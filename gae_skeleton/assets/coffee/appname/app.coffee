@@ -24,18 +24,34 @@ class App.Appname.Views.App extends Backbone.View
         @$el.html('')
 
 
-class App.Appname.Views.AddApp extends App.Appname.Views.App
+class App.Appname.Views.ModelApp extends App.Appname.Views.App
+    template: null
     modelType: null
-    addForm: null
+    modelName: null
+    form: null
     view: null
+    listView: null
 
     events:
         "click .add-button": "add"
 
-    initialize: (modelType, form) =>
-        @modelType = modelType
-        @addForm = form
+    initialize: =>
+        @modelName = @modelType.name
 
+    render: =>
+        App.Appname.Events.bind(@modelName + ":add", this.addItem, this)
+
+        @$el.html(@template())
+
+        @listView = new App.Appname.Views.ListApp(
+            @modelName + "List", @$("#" + @modelName + "list"))
+
+        $("#add_new").focus()
+        return this
+
+    addItem: (model) =>
+        @listView.addOne(model)
+    
     add: =>
         if @view
             @addClose()
@@ -43,12 +59,16 @@ class App.Appname.Views.AddApp extends App.Appname.Views.App
             @addOpen()
 
     addOpen: =>
+        App.Appname.Events.bind(@modelName + ":save", this.save, this)
+
         @model = new @modelType()
-        @view = new @addForm({model: @model})
-        @view.on("save", this.save, this)
+        console.log(@form)
+        @view = new @form({model: @model})
+
         el = @view.render().el
         $("#add_area").html(el)
             .find('input.code').focus()
+
         $("#add_new").text('Search Mode')
 
     addClose: =>
@@ -61,11 +81,13 @@ class App.Appname.Views.AddApp extends App.Appname.Views.App
     save: (model) =>
         valid = @view.model.isValid()
         if valid
-            this.trigger('addItem', model)
+            App.Appname.Events.trigger(@modelName + ':add', model)
             @view = null
             @add()
 
     onClose: =>
+        App.Appname.Events.unbind(null, null, this)
+
         if @view
             @view.close()
 
