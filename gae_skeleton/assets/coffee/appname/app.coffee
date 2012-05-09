@@ -27,34 +27,31 @@ class App.Appname.Views.App extends Backbone.View
 class App.Appname.Views.ModelApp extends App.Appname.Views.App
     template: null
     modelType: null
-    modelName: null
     form: null
-    view: null
+    addView: null
+    editView: null
     listView: null
     searchMode: true
 
     events:
         "click .add-button": "add"
 
-    initialize: =>
-        @modelName = @modelType.name
-
     render: =>
-        App.Appname.Events.bind(@modelName + ":add", this.addItem, this)
-        App.Appname.Events.bind(@modelName + ":edit", this.editItem, this)
+        App.Appname.Events.bind(@modelType.name + ":add", @addItem, this)
+        App.Appname.Events.bind(@modelType.name + ":edit", @editItem, this)
 
         @$el.html(@template())
 
         @listView = new App.Appname.Views.ListApp(
-            @modelName + "List", @$("#" + @modelName + "list"))
+            @modelType.name + "List", @$("#" + @modelType.name + "list"))
 
         $("#add_new").focus()
         return this
 
     editItem: (model) =>
-        App.Appname.Events.bind(@modelName + ":save", this.editSave, this)
-        @view = new @form({model: model})
-        el = @view.render(true).$el
+        App.Appname.Events.bind(@modelType.name + ":save", this.editSave, this)
+        @editView = new @form({model: model})
+        el = @editView.render(true).$el
         el.modal('show')
         el.find('input.code').focus()
 
@@ -69,12 +66,12 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 
     addOpen: =>
         @searchMode = false
-        App.Appname.Events.bind(@modelName + ":save", this.addSave, this)
+        App.Appname.Events.bind(@modelType.name + ":save", this.addSave, this)
 
         @model = new @modelType()
-        @view = new @form({model: @model})
+        @addView = new @form({model: @model})
 
-        el = @view.render().el
+        el = @addView.render().el
         $("#add_area").html(el)
             .find('input.code').focus()
 
@@ -82,41 +79,58 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 
     addClose: =>
         @searchMode = true
-        @view.close()
-        @view = null
+        if @addView
+            @addView.close()
+        @addView = null
         this.$("#add_new").text('Add Mode')
                           .focus()
 
     addSave: (model) =>
-        valid = @view.model.isValid()
+        valid = @addView.model.isValid()
         if valid
-            App.Appname.Events.trigger(@modelName + ':add', model)
-            @view = null
+            App.Appname.Events.trigger(@modelType.name + ':add', model)
+            @addView = null
             @add()
 
     editSave: (model) =>
-        @view.$el.modal('hide')
-        @view.close()
-        @view = null
+        App.Appname.Events.unbind(@modelType.name + ":save", this.editSave, this)
+        @editView.$el.modal('hide')
+        @editView.close()
+        @editView = null
 
     onClose: =>
         App.Appname.Events.unbind(null, null, this)
 
-        if @view
-            @view.close()
+        if @addView
+            @addView.close()
+        if @editView
+            @editView.close()
+
+
+class App.Appname.Views.EditView extends Backbone.View
+    tagName: "div"
+    modelType: null
+
+    clear: =>
+        @model.clear()
+
+    save: =>
+        App.Appname.Events.trigger(@modelType.name + ':save', @model, this)
+
+    updateOnEnter: (e) =>
+        if e.keyCode == 13
+            @save()
 
 
 class App.Appname.Views.ListView extends Backbone.View
     tagName: "tr"
     modelType: null
-    modelName: null
 
     events:
         "click .edit-button": "edit"
         "click .remove-button": "clear"
 
     initialize: =>
-        @modelName = @modelType.name
         @model.bind('change', @render, this)
         @model.bind('destroy', @remove, this)
 
@@ -125,7 +139,7 @@ class App.Appname.Views.ListView extends Backbone.View
         return this
 
     edit: =>
-        App.Appname.Events.trigger(@modelName + ":edit", @model, this)
+        App.Appname.Events.trigger(@modelType.name + ":edit", @model, this)
 
     clear: =>
         @model.clear()

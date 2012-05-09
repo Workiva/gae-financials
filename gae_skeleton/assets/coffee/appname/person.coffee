@@ -51,9 +51,9 @@ class App.Appname.Collections.PersonList extends Backbone.Collection
     model: App.Appname.Models.Person
 
 
-class App.Appname.Views.PersonEdit extends Backbone.View
+class App.Appname.Views.PersonEdit extends App.Appname.Views.EditView
     template: JST['person/edit']
-    tagName: "div"
+    modelType: App.Appname.Models.Person
 
     events:
         "click a.destroy": "clear"
@@ -61,6 +61,17 @@ class App.Appname.Views.PersonEdit extends Backbone.View
         "keypress .edit": "updateOnEnter"
         "click .remove-button": "clear"
         "hidden": "close"
+
+    save: =>
+        @model.contact_info.each((info) ->
+            info.edit_view.close()
+        )
+        @model.save(
+            name: @$('input.name').val()
+            notes: $.trim(@$('textarea.notes').val())
+        )
+
+        super()
 
     render: (as_modal) =>
         el = @$el
@@ -73,29 +84,12 @@ class App.Appname.Views.PersonEdit extends Backbone.View
             el.attr('class', 'modal')
         return this
 
-    clear: =>
-        @model.clear()
-
-    save: =>
-        @model.contact_info.each((info) ->
-            info.edit_view.close()
-        )
-        @model.save(
-            name: @$('input.name').val()
-            notes: $.trim(@$('textarea.notes').val())
-        )
-        App.Appname.Events.trigger('Person:save', @model)
-
     addContactInfo: () =>
         newModel = new @model.contact_info.model()
         @model.contact_info.add(newModel)
 
         editView = new App.Appname.Views.ContactInfoEdit({model: newModel})
         @$el.find('fieldset.contact_info').append(editView.render().el)
-
-    updateOnEnter: (e) =>
-        if e.keyCode == 13
-            @save()
 
 class App.Appname.Views.PersonApp extends App.Appname.Views.ModelApp
     template: JST['person/view']
@@ -105,16 +99,4 @@ class App.Appname.Views.PersonApp extends App.Appname.Views.ModelApp
 class App.Appname.Views.PersonList extends App.Appname.Views.ListView
     template: JST['person/list']
     modelType: App.Appname.Models.Person
-
-    #edit: =>
-        #@editView = new App.Appname.Views.PersonEdit({model: @model})
-        #@editView.on("save", this.save, this)
-        #el = @editView.render(true).$el
-        #el.modal('show')
-        #el.find('input.code').focus()
-
-    #save: (model) =>
-        #@editView.$el.modal('hide')
-        #@editView.close()
-
 
