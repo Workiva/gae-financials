@@ -22,6 +22,7 @@ class App.Appname.Router extends Backbone.Router
     routes:
         "": "showPerson"
         "person": "showPerson"
+        "vendor": "showVendor"
 
     initialize: (data) ->
         @menu = new App.Appname.Views.Menu()
@@ -37,4 +38,8 @@ class App.Appname.Router extends Backbone.Router
     showPerson: () =>
         console.log('calling person')
         @swap(App.Appname.Views.PersonApp)
+
+    showVendor: () =>
+        console.log('calling vendor')
+        @swap(App.Appname.Views.VendorApp)
 

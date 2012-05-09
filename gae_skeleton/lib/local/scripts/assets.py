@@ -52,7 +52,9 @@ def _bundle_app_coffee(env, debug=False):
         path.join(DISPATCH_PATH, 'app.coffee'),
         path.join(DISPATCH_PATH, 'menu.coffee'),
         path.join(DISPATCH_PATH, 'contact.coffee'),
+        path.join(DISPATCH_PATH, 'tag.coffee'),
         path.join(DISPATCH_PATH, 'person.coffee'),
+        path.join(DISPATCH_PATH, 'vendor.coffee'),
         path.join(DISPATCH_PATH, 'router.coffee'),
     )
     all_js = Bundle(

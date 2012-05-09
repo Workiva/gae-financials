@@ -85,3 +85,62 @@ class PersonHandler(webapp2.RequestHandler):
         out = person_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
+
+class VendorHandler(webapp2.RequestHandler):
+    def get(self):
+        from appname.vendor import Vendor
+        user_query = self.request.get('query')
+        limit = int(self.request.get('limit', 10))
+
+        query = Vendor.query()
+        if user_query:
+            search = user_query.strip().lower()
+            query = query.filter(Vendor.n_ >= search)
+            query = query.filter(Vendor.n_ < search + u"\uFFFD")
+
+        if limit > 0:
+            query = query.fetch(limit)
+
+        out = [entity.to_dict() for entity in query]
+        self.response.out.write(json.dumps(out))
+
+    def delete(self):
+        from google.appengine.ext import ndb
+        from appname.vendor import Vendor
+        urlsafe = self.request.path.rsplit('/', 1)[-1]
+        if not urlsafe:
+            return
+
+        key = ndb.Key(urlsafe=urlsafe)
+        if key.kind != Vendor._get_kind():
+            self.error(500)
+            return
+
+        key.delete()
+        logging.info("Deleted vendor with key: %s", urlsafe)
+
+    def post(self):
+        self.process()
+
+    def put(self):
+        self.process()
+
+    def process(self):
+        from voluptuous import Schema
+        from appname.vendor import Vendor
+        from appname.vendor import vendor_schema
+
+        vendor = json.loads(self.request.body)
+        schema = Schema(vendor_schema, extra=True)
+        try:
+            schema(vendor)
+        except:
+            logging.exception('validation failed')
+            logging.info(vendor)
+
+        vendor_entity = Vendor.from_dict(vendor)
+        vendor_entity.put()
+
+        out = vendor_entity.to_dict()
+        self.response.out.write(json.dumps(out))
+
