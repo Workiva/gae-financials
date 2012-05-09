@@ -21,11 +21,9 @@ import os
 import sys
 
 
-GAE_PATH = '/usr/local/google_appengine'
 CURRENT_PATH = os.getcwdu()
 
 paths = [
-    GAE_PATH,
     os.path.join(CURRENT_PATH, 'lib'),
     os.path.join(CURRENT_PATH, 'lib', 'local'),
 ]

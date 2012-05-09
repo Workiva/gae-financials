@@ -24,11 +24,9 @@ import argparse
 import tempfile
 
 
-GAE_PATH = '/usr/local/google_appengine'
 CURRENT_PATH = os.getcwdu()
 
 paths = [
-    GAE_PATH,
     os.path.join(CURRENT_PATH, 'lib'),
     os.path.join(CURRENT_PATH, 'lib', 'local'),
 ]
@@ -49,13 +47,13 @@ stub_config = {
 }
 
 
-def run():
+def run(args):
     parser = argparse.ArgumentParser(description='Run tests')
     parser.add_argument('tests', nargs='?', default='', help="The path to the tests")
     parser.add_argument('--failfast', action='store_true', default=False)
     parser.add_argument('--verbosity', '-v', type=int, default=1)
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     suite = _build_suite(args.tests)
 
