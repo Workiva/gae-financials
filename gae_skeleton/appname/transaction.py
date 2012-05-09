@@ -125,3 +125,14 @@ class Transaction(ndb.Model):
         }
         return transaction
 
+def get_transactions_from_google_spreadsheet():
+    import gdata.spreadsheet.service
+    client = gdata.spreadsheet.service.SpreadsheetsService()
+    key = '0Ahivi2ybuZeydGRjakJzeWFSMTJyb0t4UnFqVlRuNXc'
+    rows = client.GetListFeed(key, visibility='public', projection='basic').entry
+    ret = []
+    for row in rows:
+        # FIXME: do not put ',' or ':' in the spreadsheet
+        cols = [cell.strip().split(': ')[1] for cell in row.content.text.split(', ')]
+        ret.append(cols)
+    return ret
