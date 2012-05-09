@@ -1,5 +1,8 @@
-GAE Framework
+GAE Financials
 =============
+
+Built on top of GAE Framework
+https://github.com/EzoxSystems/gae-skeleton
 
 
 Installation
