@@ -1,8 +1,9 @@
 assets/.webassets-cache
 *.pyc
 .ropeproject
-static/script
-static/css
+gae_skeleton/static/script
+gae_skeleton/static
+node_modules
 *.ds
 *.swp
 .DS_Store
