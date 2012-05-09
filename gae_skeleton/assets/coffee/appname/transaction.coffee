@@ -128,6 +128,22 @@ class App.Appname.Views.TransactionEdit extends Backbone.View
     render: (as_modal) =>
         el = @$el
         el.html(@template(@model.toJSON()))
+        @$el.find('input.vendor').typeahead({
+            value_property: 'name'
+            updater: (item) =>
+                return item.name
+            matcher: (item) ->
+                return true
+            source: (typeahead, query) ->
+                $.ajax({
+                    type: 'GET'
+                    dataType: 'json'
+                    url: '/service/vendor'
+                    data: {query: query}
+                    success: (data) ->
+                        typeahead.process(data)
+                })
+        })
         if as_modal
             el.attr('class', 'modal')
         return this
