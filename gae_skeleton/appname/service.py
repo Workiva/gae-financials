@@ -33,7 +33,7 @@ class PersonHandler(webapp2.RequestHandler):
     def get(self):
         from appname.person import Person
         user_query = self.request.get('query')
-        limit = int(self.request.get('limit', 10))
+        limit = int(self.request.get('limit', 40))
 
         query = Person.query(namespace="")
         if user_query:
@@ -92,7 +92,7 @@ class VendorHandler(webapp2.RequestHandler):
     def get(self):
         from appname.vendor import Vendor
         user_query = self.request.get('query')
-        limit = int(self.request.get('limit', 10))
+        limit = int(self.request.get('limit', 40))
 
         query = Vendor.query()
         if user_query:
@@ -166,7 +166,7 @@ class VendorHandler(webapp2.RequestHandler):
 class TransactionHandler(webapp2.RequestHandler):
     def get(self):
         from appname.transaction import Transaction
-        limit = int(self.request.get('limit', 10))
+        limit = int(self.request.get('limit', 40))
 
         query = Transaction.query()
 
