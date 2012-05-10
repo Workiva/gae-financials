@@ -204,13 +204,6 @@ class SummaryHandler(webapp2.RequestHandler):
     modification of the stats entities happens only through
     the well-defined aggregation process.
     """
-    PERIOD_MAP = {
-        'o': 0,
-        'y': 4,
-        'm': 6,
-        'd': 8,
-        'h': 10
-    }
 
     def get(self):
         from appname.aggregators import TagStats
@@ -224,8 +217,7 @@ class SummaryHandler(webapp2.RequestHandler):
             query = query.filter(TagStats.tag == search_tag)
 
         # Default to finding days.
-        search_period = self.PERIOD_MAP.get(period, 8)
-        query = query.filter(TagStats.period_length == search_period)
+        query = query.filter(TagStats.period_type == period)
 
         # Cap the maximum at 1000
         if 0 < limit < 1000:

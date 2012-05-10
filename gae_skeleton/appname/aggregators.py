@@ -25,11 +25,19 @@ from google.appengine.api import taskqueue
 
 import webapp2
 
+PERIOD_MAP = {
+    0: 'o',
+    4: 'y',
+    6: 'm',
+    8: 'd',
+    10: 'h'
+}
 
 class TagStats(ndb.Model):
     """Stats about Tag entities."""
     period = ndb.StringProperty('p')
-    period_length = ndb.ComputedProperty(lambda self: len(self.period), name='pl')
+    period_type = ndb.ComputedProperty(
+        lambda self: PERIOD_MAP.get(len(self.period), 'e'), name='pt')
 
     tag = ndb.StringProperty('t')
 
@@ -80,26 +88,35 @@ def apply_work(work):
     for unit in payloads:
         amount = Decimal(unit['amount'])
 
-        unit_model = _get_model(unit['stat_key'], stat_models)
+        check_model_key = unit['stat_keys'].pop()
+        check_model = _get_model(check_model_key, stat_models)
 
         entity_key = ndb.Key(urlsafe=unit['entity'])
-        last_rev = unit_model.index.get(entity_key.id())
+        last_rev, value = check_model.index.get(entity_key.id(), (None, '0'))
         if last_rev >= unit.get('rev', 0):
             continue
 
-        # TODO: Handle changes and removals of current values.
-        unit_model.index[entity_key.id()] = unit['rev']
+        new = False
+        if last_rev is None:
+            new = True
 
-        for model in [root_model, unit_model]:
-            stats = model.stats
+        check_model.index[entity_key.id()] = (unit['rev'], str(amount))
+        delta = amount - Decimal(value)
 
-            stats['n'] += 1
-            stats['s'] = str(Decimal(stats['s']) + amount)
+        _update_stats(root_model.stats, delta, new)
+        _update_stats(check_model.stats, delta, new)
 
-    import logging
-    logging.info(stat_models)
+        for key in unit['stat_keys']:
+            model = _get_model(key, stat_models)
+            _update_stats(model.stats, delta, new)
+
     ndb.put_multi(stat_models.values())
 
+
+def _update_stats(stats, amount, new):
+    """Update a stats collection."""
+    stats['n'] += new
+    stats['s'] = str(Decimal(stats['s']) + amount)
 
 def _parse_work_tasks(work):
     """Parse the work tasks and return stat_model_keys and payloads."""
@@ -114,9 +131,12 @@ def _parse_work_tasks(work):
         payload = json.loads(unit.payload)
         payloads.append(payload)
 
-        stat_key = ndb.Key(TagStats, payload['date'][:10], parent=root_stat_key)
-        stat_model_keys.add(stat_key)
-        payload['stat_key'] = stat_key
+        keys = []
+        for group in [4, 6, 8, 10]:
+            stat_key = ndb.Key(TagStats, payload['date'][:group], parent=root_stat_key)
+            stat_model_keys.add(stat_key)
+            keys.append(stat_key)
+        payload['stat_keys'] = keys
 
     return (root_stat_key,) + tuple(stat_model_keys), payloads
 
