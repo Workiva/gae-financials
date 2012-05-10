@@ -20,18 +20,27 @@ class App.Appname.Models.Activity extends Backbone.Model
     defaults: ->
         return {
             location: "",
-            time: "",
             what: ""
         }
 
 
 class App.Appname.Collections.ActivityList extends Backbone.Collection
+    url: '/service/activity'
     model: App.Appname.Models.Activity
 
 
 class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandlers
-    onopen: =>
-        console.log('open')
+    constructor: (@listView) ->
+
+    onmessage: (message) =>
+        for message in JSON.parse(message.data).messages
+            m = new App.Appname.Models.Activity(message)
+            @listView.addOne(m)
+
+
+class App.Appname.Views.ActivityList extends App.Appname.Views.ListView
+    template: JST['activity/list']
+    modelType: App.Appname.Models.Activity
 
 
 class App.Appname.Views.ActivityApp extends App.Appname.Views.App
@@ -40,9 +49,14 @@ class App.Appname.Views.ActivityApp extends App.Appname.Views.App
     render: =>
         @$el.html(@template())
 
+        @listView = new App.Appname.Views.ListApp(
+            'ActivityList', @$("#Activitylist"))
+
         channelapp = new App.Appname.Views.ChannelApp()
-        handler = new App.Appname.Views.ActivityHandler()
+        handler = new App.Appname.Views.ActivityHandler(@listView)
         channelapp.setupChannel(handler)
+
+        @listView.addOne(m)
 
         return this
 
