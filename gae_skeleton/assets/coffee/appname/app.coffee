@@ -92,7 +92,6 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         valid = @addView.model.isValid()
         if valid
             App.Appname.Events.trigger(@modelType.name + ':add', model)
-            @addView = null
             @add()
 
     editSave: (model) =>
@@ -117,8 +116,11 @@ class App.Appname.Views.EditView extends Backbone.View
 
     clear: =>
         @model.clear()
+        @render(@is_modal)
 
     render: (as_modal) =>
+        @is_modal = as_modal
+        @model.bind('change', @render, this)
         header = this.$("#editheader")
 
         if as_modal
@@ -138,6 +140,8 @@ class App.Appname.Views.EditView extends Backbone.View
     updateOnEnter: (e) =>
         if e.keyCode == 13
             @save()
+            if @model.isValid()
+                @close
 
 
 class App.Appname.Views.ListView extends Backbone.View
@@ -146,7 +150,7 @@ class App.Appname.Views.ListView extends Backbone.View
 
     events:
         "click .edit-button": "edit"
-        "click .remove-button": "clear"
+        "click .remove-button": "remove"
 
     initialize: =>
         @model.bind('change', @render, this)
@@ -159,8 +163,8 @@ class App.Appname.Views.ListView extends Backbone.View
     edit: =>
         App.Appname.Events.trigger(@modelType.name + ":edit", @model, this)
 
-    clear: =>
-        @model.clear()
+    remove: =>
+        @model.destroy()
 
 
 class App.Appname.Views.ListApp extends App.Appname.Views.App
