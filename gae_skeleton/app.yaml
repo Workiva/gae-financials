@@ -28,7 +28,7 @@ handlers:
 
 - url: /service/.*
   script: service.app
-  login: required
+  #login: required
 
 - url: .*
   script: main.app
