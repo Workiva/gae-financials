@@ -90,7 +90,7 @@ class App.Appname.Collections.SummaryList extends Backbone.Collection
     initialize: ->
         handler = new App.Appname.Views.SummaryChannelHandlers()
         handler.setCollection(this)
-        handler.setPeriodType(this)
+        handler.setPeriodType('d')
         channelapp = new App.Appname.Views.ChannelApp()
         channelapp.setupChannel(handler)
 
