@@ -30,10 +30,6 @@ handlers:
   script: service.app
   login: admin
 
-- url: /service/person/.*
-  script: service.app
-  login: admin
-
 - url: /service/.*
   script: service.app
   #login: required
