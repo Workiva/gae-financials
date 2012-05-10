@@ -62,6 +62,7 @@ class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
         "click a.destroy": "clear"
         "keypress .edit": "updateOnEnter"
         "click .remove-button": "clear"
+        "click .save": "save"
         "hidden": "close"
 
     render: (as_modal) =>
