@@ -55,6 +55,7 @@ class App.Appname.Views.VendorEdit extends App.Appname.Views.EditView
     events:
         "click a.destroy": "clear"
         "click a.add_tag": "addTag"
+        "click .save": "save"
         "keypress .edit": "updateOnEnter"
         "click .remove-button": "clear"
         "hidden": "close"
