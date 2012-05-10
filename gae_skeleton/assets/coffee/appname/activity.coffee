@@ -89,5 +89,3 @@ class App.Appname.Views.ChannelHandlers
 
     onclose: =>
         console.log('close')
-
-

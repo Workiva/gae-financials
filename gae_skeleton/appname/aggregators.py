@@ -35,6 +35,12 @@ PERIOD_MAP = {
 
 class TagStats(ndb.Model):
     """Stats about Tag entities."""
+    # Store the schema version, to aid in migrations.
+    version_ = ndb.IntegerProperty('v_', default=1)
+
+    # The entity's change revision counter.
+    revision = ndb.IntegerProperty('r_', default=0)
+
     period = ndb.StringProperty('p')
     period_type = ndb.ComputedProperty(
         lambda self: PERIOD_MAP.get(len(self.period), 'e'), name='pt')
@@ -43,6 +49,31 @@ class TagStats(ndb.Model):
 
     stats = ndb.JsonProperty('s')
     index = ndb.JsonProperty('i')
+
+    def _pre_put_hook(self):
+        """Ran before the entity is written to the datastore."""
+        self.revision += 1
+
+    def to_dict(self):
+        """Return a TagStats entity represented as a dict of values."""
+        tagstats = {
+            'version': self.version_,
+            'key': self.key.urlsafe(),
+            'revision': self.revision,
+
+            # tag
+            'tag': self.tag,
+
+            # period
+            'period': self.period,
+
+            # period type
+            'period_type': self.period_type,
+
+            # Stats
+            'stats': self.stats,
+        }
+        return tagstats
 
 
 class WorkBatcherHandler(webapp2.RequestHandler):
@@ -92,7 +123,8 @@ def apply_work(work):
         check_model = _get_model(check_model_key, stat_models)
 
         entity_key = ndb.Key(urlsafe=unit['entity'])
-        last_rev, value = check_model.index.get(entity_key.id(), (None, '0'))
+        entity_id = unicode(entity_key.id())
+        last_rev, value = check_model.index.get(entity_id, (None, '0'))
         if last_rev >= unit.get('rev', 0):
             continue
 
@@ -100,7 +132,7 @@ def apply_work(work):
         if last_rev is None:
             new = True
 
-        check_model.index[entity_key.id()] = (unit['rev'], str(amount))
+        check_model.index[entity_id] = (unit['rev'], str(amount))
         delta = amount - Decimal(value)
 
         _update_stats(root_model.stats, delta, new)
