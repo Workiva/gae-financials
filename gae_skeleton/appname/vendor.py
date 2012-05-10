@@ -63,9 +63,12 @@ class Vendor(ndb.Model):
             vendor = key.get()
 
         if not vendor:
-            vendor_keyname = base64.b64encode(data.get('name'))
+            vendor_keyname = base64.b64encode(data.get('name').lower())
             vendor_key = ndb.Key(cls, vendor_keyname)
             vendor = cls(key=vendor_key)
+            vendor.is_new = True
+        else:
+            vendor.is_new = False
 
         vendor.name = data.get('name')
         vendor.tags = data.get('tags')

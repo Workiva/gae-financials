@@ -99,7 +99,8 @@ class WorkBatcherHandler(webapp2.RequestHandler):
 
         models = [model.to_dict() for model in stat_models]
 
-        event.send("SUMMARY-%s" % namespace, models)
+        payload = {'what': 'Summaries updated.', 'summaries': models}
+        event.send("SUMMARY-%s" % namespace, payload)
 
 
 @ndb.transactional

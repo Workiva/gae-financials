@@ -33,7 +33,7 @@ class PersonHandler(webapp2.RequestHandler):
     def get(self):
         from appname.person import Person
         user_query = self.request.get('query')
-        limit = int(self.request.get('limit', 10))
+        limit = int(self.request.get('limit', 40))
 
         query = Person.query(namespace="")
         if user_query:
@@ -92,7 +92,7 @@ class VendorHandler(webapp2.RequestHandler):
     def get(self):
         from appname.vendor import Vendor
         user_query = self.request.get('query')
-        limit = int(self.request.get('limit', 10))
+        limit = int(self.request.get('limit', 40))
 
         query = Vendor.query()
         if user_query:
@@ -143,6 +143,22 @@ class VendorHandler(webapp2.RequestHandler):
         vendor_entity = Vendor.from_dict(vendor)
         vendor_entity.put()
 
+        user_id = users.get_current_user().user_id()
+        person = Person.get_by_id(user_id)
+        if vendor_entity.is_new:
+            what = "Vendor Created."
+        else:
+            what = "Vendor Updated."
+        what = "%s %s with tags: %s" % (what, vendor_entity.name, vendor_entity.tags)
+        loc = ""
+        if person is not None and person.location_info is not None:
+            loc = person.location_info.get('latlong')
+        message = {'location': loc,
+                    'what': what}
+        event.send("ACTIVITY", message)
+        logging.info("Sending message: %s" % message)
+
+
         out = vendor_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
@@ -150,7 +166,7 @@ class VendorHandler(webapp2.RequestHandler):
 class TransactionHandler(webapp2.RequestHandler):
     def get(self):
         from appname.transaction import Transaction
-        limit = int(self.request.get('limit', 10))
+        limit = int(self.request.get('limit', 40))
 
         query = Transaction.query()
 
