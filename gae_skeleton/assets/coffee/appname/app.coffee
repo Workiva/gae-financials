@@ -50,8 +50,9 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         return this
 
     editItem: (model) =>
-        @addClose()
         App.Appname.Events.bind(@modelType.name + ":save", this.editSave, this)
+
+        @addClose()
         @editView = new @form({model: model})
         el = @editView.render(true).$el
         el.modal('show')
@@ -67,13 +68,16 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
             @addClose()
 
     addOpen: =>
-        @searchMode = false
         App.Appname.Events.bind(@modelType.name + ":save", this.addSave, this)
+        App.Appname.Events.unbind(
+            @modelType.name + ":save", this.editSave, this)
+
+        @searchMode = false
 
         @model = new @modelType()
         @addView = new @form({model: @model})
 
-        el = @addView.render().el
+        el = @addView.render(false).el
         $("#add_area").html(el)
             .find('input.code').focus()
 
@@ -81,7 +85,9 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 
     addClose: =>
         App.Appname.Events.unbind(@modelType.name + ":save", this.addSave, this)
+
         @searchMode = true
+
         if @addView
             @addView.close()
         @addView = null
@@ -92,7 +98,7 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         valid = @addView.model.isValid()
         if valid
             App.Appname.Events.trigger(@modelType.name + ':add', model)
-            @add()
+            @addOpen()
 
     editSave: (model) =>
         App.Appname.Events.unbind(@modelType.name + ":save", this.editSave, this)
@@ -120,7 +126,7 @@ class App.Appname.Views.EditView extends Backbone.View
 
     render: (as_modal) =>
         @is_modal = as_modal
-        @model.bind('change', @render, this)
+
         header = this.$("#editheader")
 
         if as_modal
