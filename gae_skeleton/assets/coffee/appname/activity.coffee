@@ -45,8 +45,8 @@ class App.Appname.Views.ActivityApp extends App.Appname.Views.App
         map.setView(new L.LatLng('51.505', '-0.09'), 13)
             .addLayer(cloud)
 
-        #channelapp = new App.Appname.Views.ChannelApp()
-        #channelapp.setupChannel()
+        channelapp = new App.Appname.Views.ChannelApp()
+        channelapp.setupChannel()
 
         return this
 
