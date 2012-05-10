@@ -27,9 +27,6 @@ class App.Appname.Views.ChannelApp extends Backbone.View
 
 class App.Appname.Views.ChannelHandlers
 
-    sendMessage: (message) =>
-        console.log(message)
-
     onopen: =>
         console.log('open')
 
