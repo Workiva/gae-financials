@@ -251,3 +251,34 @@ class SummaryHandler(webapp2.RequestHandler):
         out = [entity.to_dict() for entity in stats]
         self.response.out.write(json.dumps(out))
 
+
+
+class ChannelConnectedHandler(webapp2.RequestHandler):
+    """
+    Called when a Channel has been connected.
+    """
+
+
+    def post(self):
+        import event
+
+        channel_id = self.request.get('from')
+
+        event.subscribe('ACTIVITY', channel_id)
+        event.subscribe('SUMMARY-%s' % channel_id, channel_id)
+
+
+
+class ChannelDisconnectedHandler(webapp2.RequestHandler):
+    """
+    Called when a Channel has been disconnected.
+    """
+
+
+    def post(self):
+        import event
+
+        channel_id = self.request.get('from')
+
+        event.unsubscribe('ACTIVITY', channel_id)
+        event.unsubscribe('SUMMARY-%s' % channel_id, channel_id)
