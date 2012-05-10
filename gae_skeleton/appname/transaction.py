@@ -19,6 +19,7 @@
 
 import base64
 from google.appengine.ext import ndb
+import logging
 
 transaction_schema = {
     'key': basestring,
@@ -90,19 +91,17 @@ class Transaction(ndb.Model):
         # 1 = date (with current time, as a struct_time)
         # 2 = time (with current date, as a struct_time)
         # 3 = datetime
-        if what in (1,2):
+        if what in (1,2,3):
             # result is struct_time
             dt = datetime(*result[:6])
-        elif what == 3:
-            # result is a datetime
-            dt = result
 
         if dt is None:
             try:
-                c.parseDate(input)
+                dt = c.parseDate(input)
             except ValueError:
                 dt = None
 
+        logging.info(dt)
         return dt
 
 
@@ -148,7 +147,7 @@ class Transaction(ndb.Model):
             'modified': self.modified.strftime('%Y-%m-%d %h:%M'),
 
             # date
-            'date': self.date.strftime('%m/%d/%Y') if self.date is not None else None,
+            'date': self.date.strftime('%m/%d/%Y %H:%M') if self.date is not None else "Bad Date",
 
             # vendor
             'vendor': self.vendor_name,
