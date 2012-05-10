@@ -202,10 +202,18 @@ class TransactionHandler(webapp2.RequestHandler):
 class ChannelTokenHandler(webapp2.RequestHandler):
 
     def get(self):
-        import uuid
         from google.appengine.api import channel
+        from google.appengine.api import users
+        import event
 
-        token = channel.create_channel(str(uuid.uuid4()))
+        user_id = users.get_current_user().user_id()
+        token = channel.create_channel(user_id)
+
+        # We will send Activity to everyone
+        event.subscribe("ACTIVITY", token)
+        # We will send results from aggregations just to the
+        # user who created the data.
+        event.subscribe("SUMMARY-%s" % user_id, token)
 
         self.response.out.write(json.dumps({
                 "token": token
