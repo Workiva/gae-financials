@@ -23,7 +23,7 @@ class Subscribers(ndb.Model):
 
     @classmethod
     def build_key(cls, name):
-        return ndb.Key.from_path(cls.kind(), name)
+        return ndb.Key(cls, name)
 
 
 
