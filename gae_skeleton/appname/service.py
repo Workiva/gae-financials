@@ -226,10 +226,10 @@ class ChannelTokenHandler(webapp2.RequestHandler):
         token = channel.create_channel(user_id)
 
         # We will send Activity to everyone
-        event.subscribe("ACTIVITY", token)
+        event.subscribe("ACTIVITY", user_id)
         # We will send results from aggregations just to the
         # user who created the data.
-        event.subscribe("SUMMARY-%s" % user_id, token)
+        event.subscribe("SUMMARY-%s" % user_id, user_id)
 
         self.response.out.write(json.dumps({
                 "token": token
