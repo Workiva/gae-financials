@@ -31,15 +31,13 @@ def push_message(name, json_payload):
 
     channel_ids = sub.get_subscribers(name)
 
-    rpcs = []
+    #rpcs = []
 
     for channel_id in channel_ids:
-        rpc = async_send_message(channel_id, json_payload)
+        channel.send_message(channel_id, json_payload)
 
-        rpcs.append(rpc)
-
-    logging.info(rpcs)
-
+        #rpc = async_send_message(channel_id, json_payload)
+        #rpcs.append(rpc)
 
 
 
