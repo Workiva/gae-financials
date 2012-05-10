@@ -143,7 +143,10 @@ def flush(name):
 
 
 def get_subscribers(name):
-    memcache_key = unicode(name, 'utf-8')
+    if isinstance(name, unicode):
+        memcache_key = name.encode('utf-8')
+    else:
+        memcache_key = unicode(name, 'utf-8')
 
     channel_ids = memcache.get(memcache_key, namespace=MEMCACHE_NS)
 
