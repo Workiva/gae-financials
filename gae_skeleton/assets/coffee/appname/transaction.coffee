@@ -48,81 +48,21 @@ class App.Appname.Models.Transaction extends Backbone.Model
         if hasError
             return errors
 
-    clear: =>
-        @destroy()
-
 
 class App.Appname.Collections.TransactionList extends Backbone.Collection
     url: '/service/transaction'
     model: App.Appname.Models.Transaction
 
 
-class App.Appname.Views.TransactionApp extends App.Appname.Views.App
-    template: JST['transaction/view']
-    addView: null
-    listView: null
-
-    render: =>
-        @$el.html(@template())
-
-        @listView = new App.Appname.Views.ListApp(
-            'TransactionList', this.$("#transactionlist"))
-        @addView = new App.Appname.Views.AddApp(
-            App.Appname.Models.Transaction, App.Appname.Views.TransactionEdit)
-
-        @addView.on("addItem", this.addTransaction, this)
-
-        $("#add_new").focus()
-        return this
-
-    addTransaction: (model) =>
-        @listView.addOne(model)
-
-    onClose: =>
-        @addView.close()
-        @listView.close()
-
-
-class App.Appname.Views.TransactionList extends Backbone.View
-    template: JST['transaction/list']
-    tagName: "tr"
-    editView: null
-
-    events:
-        "click .edit-button": "edit"
-        "click .remove-button": "clear"
-
-    initialize: =>
-        @model.bind('change', @render, this)
-        @model.bind('destroy', @remove, this)
-
-    render: =>
-        @$el.html(@template(@model.toJSON()))
-        return this
-
-    edit: =>
-        @editView = new App.Appname.Views.TransactionEdit({model: @model})
-        @editView.on("save", @save, this)
-        el = @editView.render(true).$el
-        el.modal('show')
-        el.find('input.code').focus()
-
-    save: (model) =>
-        @editView.$el.modal('hide')
-        @editView.close()
-
-    clear: =>
-        @model.clear()
-
-
-class App.Appname.Views.TransactionEdit extends Backbone.View
+class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
     template: JST['transaction/edit']
-    tagName: "div"
+    modelType: App.Appname.Models.Transaction
 
     events:
         "click a.destroy": "clear"
         "keypress .edit": "updateOnEnter"
         "click .remove-button": "clear"
+        "click .save": "save"
         "hidden": "close"
 
     render: (as_modal) =>
@@ -144,27 +84,26 @@ class App.Appname.Views.TransactionEdit extends Backbone.View
                         typeahead.process(data)
                 })
         })
-        if as_modal
-            el.attr('class', 'modal')
-        return this
 
-    clear: =>
-        @model.clear()
+        return super(as_modal)
 
     save: =>
-        console.log(
-            date: @$('input.date').val()
-            vendor: @$('input.vendor').val()
-            amount: @$('input.amount').val()
-        )
         @model.save(
             date: @$('input.date').val()
             vendor: @$('input.vendor').val()
             amount: @$('input.amount').val()
         )
-        @trigger('save', @model)
 
-    updateOnEnter: (e) =>
-        if e.keyCode == 13
-            @save()
+        super()
+
+
+class App.Appname.Views.TransactionApp extends App.Appname.Views.ModelApp
+    template: JST['transaction/view']
+    modelType: App.Appname.Models.Transaction
+    form: App.Appname.Views.TransactionEdit
+
+
+class App.Appname.Views.TransactionList extends App.Appname.Views.ListView
+    template: JST['transaction/list']
+    modelType: App.Appname.Models.Transaction
 

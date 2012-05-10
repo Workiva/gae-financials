@@ -17,7 +17,9 @@
 
 """Transaction model definition and business logic."""
 
+import base64
 from google.appengine.ext import ndb
+import logging
 
 transaction_schema = {
     'key': basestring,
@@ -40,7 +42,7 @@ class Transaction(ndb.Model):
 
     # Transaction date
     date = ndb.DateTimeProperty('d', indexed=False)
-    vendor = ndb.StringProperty('v', indexed=False)
+    vendor_name = ndb.StringProperty('v', indexed=False)
     amount = ndb.StringProperty('a', indexed=False)
     #v_ = ndb.ComputedProperty(lambda self: self.vendor.lower())
 
@@ -55,28 +57,68 @@ class Transaction(ndb.Model):
         """Ran after the entity is written to the datastore."""
         import json
         from google.appengine.api import taskqueue
+        from google.appengine.api import namespace_manager
 
         if not self.tags:
             return
 
+        # TODO:  Note that deletions and changes of day will result in
+        # over counting.  A reversing entry needs made for those items.
         work = []
-        for tag in self.tags:
-            task_name = "%s:%s:%s" % (tag, self.key.urlsafe, self.revision)
+        for tag_data in self.tags:
+            tag = tag_data['name'].lower()
+            task_name = "%s_%s_%s" % (tag, self.key.urlsafe(), self.revision)
             work.append(taskqueue.Task(
+                method='PULL',
                 name=task_name,
                 tag=tag,
                 payload=json.dumps({
-                    'entity': self.key.urlsafe,
+                    'entity': self.key.urlsafe(),
                     'rev': self.revision,
-                    'payload': self.amount
+                    'date': self.date.strftime('%Y%m%d%H%M'),
+                    'amount': self.amount,
+                    'namespace': namespace_manager.get_namespace()
                 }),
             ))
         taskqueue.Queue(name='work-groups').add(work)
+        taskqueue.add(
+            queue_name='default',
+            url='/_ah/task/batcher'
+        )
+
+    @classmethod
+    def normalize_date_input(cls, input):
+        from time import mktime
+        from datetime import datetime
+        import parsedatetime.parsedatetime as pdt
+
+        c = pdt.Calendar()
+        result, what = c.parse(input)
+
+        dt = None
+
+        # what was returned (see http://code-bear.com/code/parsedatetime/docs/)
+        # 0 = failed to parse
+        # 1 = date (with current time, as a struct_time)
+        # 2 = time (with current date, as a struct_time)
+        # 3 = datetime
+        if what in (1,2,3):
+            # result is struct_time
+            dt = datetime(*result[:6])
+
+        if dt is None:
+            try:
+                dt = c.parseDate(input)
+            except ValueError:
+                dt = None
+
+        return dt
+
+
 
     @classmethod
     def from_dict(cls, data):
         """Instantiate a Transaction entity from a dict of values."""
-        from datetime import datetime
         from appname.vendor import Vendor
 
         key = data.get('key')
@@ -88,14 +130,14 @@ class Transaction(ndb.Model):
         if not transaction:
             transaction = cls()
 
-        # TODO: Fix date processing.
-        transaction.date = datetime.strptime(data.get('date'), '%m/%d/%Y')
-        transaction.vendor = data.get('vendor')
+        transaction.date = cls.normalize_date_input(data.get('date'))
+        transaction.vendor_name = data.get('vendor')
 
         # TODO: Use Python Decimal here with prec set to .00.
         transaction.amount = data.get('amount')
 
-        vendor = Vendor.get_by_id(transaction.vendor)
+        vendor_keyname = base64.b64encode(transaction.vendor_name)
+        vendor = Vendor.get_by_id(vendor_keyname)
         if vendor:
             transaction.tags = vendor.tags
 
@@ -113,13 +155,24 @@ class Transaction(ndb.Model):
             'modified': self.modified.strftime('%Y-%m-%d %h:%M'),
 
             # date
-            'date': self.date.strftime('%m/%d/%Y'),
+            'date': self.date.strftime('%m/%d/%Y %H:%M') if self.date is not None else "Bad Date",
 
             # vendor
-            'vendor': self.vendor,
+            'vendor': self.vendor_name,
 
             # amount
             'amount': self.amount,
         }
         return transaction
 
+def get_transactions_from_google_spreadsheet():
+    import gdata.spreadsheet.service
+    client = gdata.spreadsheet.service.SpreadsheetsService()
+    key = '0Ahivi2ybuZeydGRjakJzeWFSMTJyb0t4UnFqVlRuNXc'
+    rows = client.GetListFeed(key, visibility='public', projection='basic').entry
+    ret = []
+    for row in rows:
+        # FIXME: do not put ',' or ':' in the spreadsheet
+        cols = [cell.strip().split(': ')[1] for cell in row.content.text.split(', ')]
+        ret.append(cols)
+    return ret

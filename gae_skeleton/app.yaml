@@ -19,9 +19,15 @@ handlers:
 - url: /static
   static_dir: static
 
+- url: /_ah/task/.*
+  script: task.app
+  login: required
+
 - url: /service/.*
   script: service.app
+  login: required
 
 - url: .*
   script: main.app
+  login: required
 

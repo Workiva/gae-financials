@@ -1,0 +1,7 @@
+queue:
+- name: work-groups
+  mode: pull
+
+- name: workers
+  rate: 100/s
+

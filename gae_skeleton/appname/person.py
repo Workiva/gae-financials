@@ -45,6 +45,9 @@ class Person(ndb.Model):
     # Phone / email / whatever.
     contact_info = ndb.JsonProperty('ci')
 
+    # Location Information
+    location_info = ndb.JsonProperty('li')
+
     # General remarks.
     notes = ndb.TextProperty('no')
 
@@ -62,7 +65,7 @@ class Person(ndb.Model):
             person = key.get()
 
         if not person:
-            person = cls()
+            person = cls(namespace="")
 
         person.name = data.get('name')
         person.contact_info = data.get('contact_info')
@@ -80,6 +83,7 @@ class Person(ndb.Model):
             'revision': self.revision,
             'added': self.added.strftime('%Y-%m-%d %h:%M'),
             'modified': self.modified.strftime('%Y-%m-%d %h:%M'),
+            'latlong': self.location_info.get('latlong') if self.location_info is not None else "",
 
             # name
             'name': self.name,
@@ -92,3 +96,18 @@ class Person(ndb.Model):
         }
         return person
 
+def initilize_person(headers):
+    from google.appengine.api import users
+    user = users.get_current_user()
+    person = ndb.Key(Person, user.user_id(), namespace="").get()
+    if not person:
+        person_key = ndb.Key(Person, user.user_id(), namespace="")
+        person = Person(key=person_key, name=user.nickname())
+        location_info = {
+            'country': headers.get("X-AppEngine-Country"),
+            'region': headers.get("X-AppEngine-Region"),
+            'city': headers.get("X-AppEngine-City"),
+            'latlong': headers.get("X-AppEngine-CityLatLong"),
+            }
+        person.location_info = location_info
+        person.put()

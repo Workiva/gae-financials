@@ -42,22 +42,38 @@ from webassets.script import CommandLineEnvironment
 INPUT_FILES = path.join(os.getcwdu(), 'assets')
 OUTPUT_FILES = path.join(os.getcwdu(), 'static')
 
+
+
+def _bundle_images(env):
+    """Push images into static."""
+    #TODO: add png crush or something similar
+
+    import shutil
+    try:
+        shutil.rmtree(path.join(OUTPUT_FILES, 'img'))
+    except:
+        pass
+    shutil.copytree(path.join(INPUT_FILES, 'img'), path.join(OUTPUT_FILES, 'img'))
+
+
 def _bundle_app_coffee(env, debug=False):
     """Compile the apps coffeescript and bundle it into appname.js"""
     COFFEE_PATH = 'coffee'
-    DISPATCH_PATH = path.join(COFFEE_PATH, 'appname')
+    APP_PATH = path.join(COFFEE_PATH, 'appname')
     scripts = (
         path.join(COFFEE_PATH, 'nested.coffee'),
         path.join(COFFEE_PATH, 'app.coffee'),
-        path.join(DISPATCH_PATH, 'app.coffee'),
-        path.join(DISPATCH_PATH, 'menu.coffee'),
-        path.join(DISPATCH_PATH, 'contact.coffee'),
-        path.join(DISPATCH_PATH, 'tag.coffee'),
-        path.join(DISPATCH_PATH, 'person.coffee'),
-        path.join(DISPATCH_PATH, 'vendor.coffee'),
-        path.join(DISPATCH_PATH, 'transaction.coffee'),
-        path.join(DISPATCH_PATH, 'router.coffee'),
+        path.join(APP_PATH, 'app.coffee'),
+        path.join(APP_PATH, 'menu.coffee'),
+        path.join(APP_PATH, 'contact.coffee'),
+        path.join(APP_PATH, 'tag.coffee'),
+        path.join(APP_PATH, 'person.coffee'),
+        path.join(APP_PATH, 'vendor.coffee'),
+        path.join(APP_PATH, 'activity.coffee'),
+        path.join(APP_PATH, 'transaction.coffee'),
+        path.join(APP_PATH, 'router.coffee'),
     )
+
     all_js = Bundle(
         *scripts,
         filters='coffeescript',
@@ -98,6 +114,7 @@ def _bundle_3rd_party_js(env, debug=False):
             path.join(JSPATH, 'underscore.js'),
             path.join(JSPATH, 'backbone.js'),
             path.join(JSPATH, 'bootstrap.js'),
+            path.join(JSPATH, 'leaflet.js'),
             path.join(JSPATH, 'bootstrap-typeahead-improved.js'),
             output=path.join('..', 'static', 'script', 'libs.js')
         )
@@ -109,6 +126,7 @@ def _bundle_3rd_party_js(env, debug=False):
             path.join(JSPATH, 'underscore-min.js'),
             path.join(JSPATH, 'backbone-min.js'),
             path.join(JSPATH, 'bootstrap-min.js'),
+            path.join(JSPATH, 'leaflet-min.js'),
             path.join(JSPATH, 'bootstrap-typeahead-improved-min.js'),
             output=path.join('..', 'static', 'script', 'libs.js')
         )
@@ -123,11 +141,15 @@ def _bundle_3rd_party_css(env, debug=False):
     if debug:
         bundle = Bundle(
                 path.join('css', 'bootstrap.css'),
+                path.join('css', 'leaflet.css'),
+                path.join('css', 'leaflet.ie.css'),
                 output=path.join('..', 'static', 'css', 'lib.css')
             )
     else:
         bundle = Bundle(
                 path.join('css', 'min', 'bootstrap.min.css'),
+                path.join('css', 'leaflet.css'),
+                path.join('css', 'leaflet.ie.css'),
                 output=path.join('..', 'static', 'css', 'lib.css')
             )
 
@@ -169,6 +191,9 @@ def _setup_env(debug=True, cache=True):
     #css
     _bundle_app_less(env, debug)
     _bundle_3rd_party_css(env, debug)
+
+    #images
+    _bundle_images(env)
 
     return env
 
