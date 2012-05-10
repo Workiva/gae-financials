@@ -54,6 +54,16 @@ class App.Appname.Views.SummaryApp extends App.Appname.Views.ModelApp
     template: JST['summary/view']
     modelType: App.Appname.Models.Summary
 
+    initialize: ->
+        channelapp = new App.Appname.Views.ChannelApp()
+        channelapp.setupChannel(new App.Appname.Views.SummaryChannelHandlers)
+
+
+class App.Appname.Views.SummaryChannelHandlers extends App.Appname.Views.ChannelHandlers
+
+    onmessage: (message) =>
+        alert(message)
+
 
 class App.Appname.Views.SummaryList extends App.Appname.Views.ListView
     template: JST['summary/list']
