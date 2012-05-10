@@ -26,7 +26,7 @@ handlers:
   script: task.app
   login: admin
 
-- url: /service/person/.*
+- url: /service/person.*
   script: service.app
   login: admin
 
