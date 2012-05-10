@@ -69,10 +69,12 @@ def _bundle_app_coffee(env, debug=False):
         path.join(APP_PATH, 'tag.coffee'),
         path.join(APP_PATH, 'person.coffee'),
         path.join(APP_PATH, 'vendor.coffee'),
+        path.join(APP_PATH, 'activity.coffee'),
         path.join(APP_PATH, 'transaction.coffee'),
         path.join(APP_PATH, 'summary.coffee'),
         path.join(APP_PATH, 'router.coffee'),
     )
+
     all_js = Bundle(
         *scripts,
         filters='coffeescript',
@@ -113,6 +115,7 @@ def _bundle_3rd_party_js(env, debug=False):
             path.join(JSPATH, 'underscore.js'),
             path.join(JSPATH, 'backbone.js'),
             path.join(JSPATH, 'bootstrap.js'),
+            path.join(JSPATH, 'leaflet.js'),
             path.join(JSPATH, 'bootstrap-typeahead-improved.js'),
             output=path.join('..', 'static', 'script', 'libs.js')
         )
@@ -124,6 +127,7 @@ def _bundle_3rd_party_js(env, debug=False):
             path.join(JSPATH, 'underscore-min.js'),
             path.join(JSPATH, 'backbone-min.js'),
             path.join(JSPATH, 'bootstrap-min.js'),
+            path.join(JSPATH, 'leaflet-min.js'),
             path.join(JSPATH, 'bootstrap-typeahead-improved-min.js'),
             output=path.join('..', 'static', 'script', 'libs.js')
         )
@@ -138,11 +142,15 @@ def _bundle_3rd_party_css(env, debug=False):
     if debug:
         bundle = Bundle(
                 path.join('css', 'bootstrap.css'),
+                path.join('css', 'leaflet.css'),
+                path.join('css', 'leaflet.ie.css'),
                 output=path.join('..', 'static', 'css', 'lib.css')
             )
     else:
         bundle = Bundle(
                 path.join('css', 'min', 'bootstrap.min.css'),
+                path.join('css', 'leaflet.css'),
+                path.join('css', 'leaflet.ie.css'),
                 output=path.join('..', 'static', 'css', 'lib.css')
             )
 

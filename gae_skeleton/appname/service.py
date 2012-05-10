@@ -199,6 +199,19 @@ class TransactionHandler(webapp2.RequestHandler):
         self.response.out.write(json.dumps(out))
 
 
+class ChannelTokenHandler(webapp2.RequestHandler):
+
+    def get(self):
+        import uuid
+        from google.appengine.api import channel
+
+        token = channel.create_channel(str(uuid.uuid4()))
+
+        self.response.out.write(json.dumps({
+                "token": token
+            }))
+
+
 class SummaryHandler(webapp2.RequestHandler):
     """The summary endpoint only supports read operations,
     modification of the stats entities happens only through
@@ -229,4 +242,3 @@ class SummaryHandler(webapp2.RequestHandler):
 
         out = [entity.to_dict() for entity in stats]
         self.response.out.write(json.dumps(out))
-
