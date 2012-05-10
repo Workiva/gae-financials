@@ -198,3 +198,15 @@ class TransactionHandler(webapp2.RequestHandler):
         out = transaction_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
+
+class ChannelTokenHandler(webapp2.RequestHandler):
+
+    def get(self):
+        import uuid
+        from google.appengine.api import channel
+
+        token = channel.create_channel(str(uuid.uuid4()))
+
+        self.response.out.write(json.dumps({
+                "token": token
+            }))

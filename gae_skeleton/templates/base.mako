@@ -29,6 +29,7 @@
         <script type="application/javascript" src="/static/script/libs.js"></script>
         <script type="application/javascript" src="/static/script/template.js"></script>
         <script type="application/javascript" src="/static/script/appname.js"></script>
+        <script type="text/javascript" src="/_ah/channel/jsapi"></script>
         <script type="text/javascript">
         $(function(){
             var appname = new App.Appname.Router

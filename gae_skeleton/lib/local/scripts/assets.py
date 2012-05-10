@@ -69,6 +69,7 @@ def _bundle_app_coffee(env, debug=False):
         path.join(APP_PATH, 'tag.coffee'),
         path.join(APP_PATH, 'person.coffee'),
         path.join(APP_PATH, 'vendor.coffee'),
+        path.join(APP_PATH, 'activity.coffee'),
         path.join(APP_PATH, 'transaction.coffee'),
         path.join(APP_PATH, 'router.coffee'),
     )
