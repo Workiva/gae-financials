@@ -140,7 +140,7 @@ class Transaction(ndb.Model):
 
         # TODO: Use Python Decimal here with prec set to .00.
         translation_table = maketrans("", "")
-        amount = data.get('ammount', "0").translate(translation_table, "$,")
+        amount = data.get('amount', "0").translate(translation_table, "$,")
         try:
             decimal.Decimal(amount)
         except decimal.InvalidOperation:
