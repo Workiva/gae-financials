@@ -32,6 +32,7 @@ import webapp2
 url_map = [
     ('.*/person.*', 'appname.service.PersonHandler'),
     ('.*/vendor.*', 'appname.service.VendorHandler'),
+    ('.*/transaction/lgs/', 'appname.service.TransactionSpreadsheetHandler'),
     ('.*/transaction.*', 'appname.service.TransactionHandler'),
     ('.*/channel/token.*', 'appname.service.ChannelTokenHandler'),
     ('.*/summary.*', 'appname.service.SummaryHandler'),

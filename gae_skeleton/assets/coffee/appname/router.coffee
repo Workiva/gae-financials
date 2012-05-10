@@ -20,7 +20,7 @@ class App.Appname.Router extends Backbone.Router
     menu: null
 
     routes:
-        "": "showPerson"
+        "": "showActivity"
         "person": "showPerson"
         "vendor": "showVendor"
         "transaction": "showTransaction"

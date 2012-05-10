@@ -231,21 +231,33 @@ class TransactionHandler(webapp2.RequestHandler):
         out = transaction_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
+class TransactionSpreadsheetHandler(webapp2.RequestHandler):
+    def get(self):
+        from appname.transaction import Transaction, get_transactions_from_google_spreadsheet
+        import datetime
+        data = get_transactions_from_google_spreadsheet()
+        logging.info(data)
+        for d in data:
+            Transaction(date=datetime.datetime.strptime(d[0], '%d/%m/%Y'), vendor_name=d[1], amount=d[2]).put()
 
 class ChannelTokenHandler(webapp2.RequestHandler):
 
     def get(self):
         from google.appengine.api import channel
 
+        from uuid import uuid4
 
         user_id = users.get_current_user().user_id()
-        token = channel.create_channel(user_id)
+
+        channel_id = user_id + uuid4().hex
+
+        token = channel.create_channel(channel_id)
 
         # We will send Activity to everyone
-        event.subscribe("ACTIVITY", user_id)
+        event.subscribe("ACTIVITY", channel_id)
         # We will send results from aggregations just to the
         # user who created the data.
-        event.subscribe("SUMMARY-%s" % user_id, user_id)
+        event.subscribe("SUMMARY-%s" % user_id, channel_id)
 
         self.response.out.write(json.dumps({
                 "token": token

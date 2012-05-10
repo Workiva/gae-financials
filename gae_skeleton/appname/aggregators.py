@@ -25,6 +25,9 @@ from google.appengine.api import taskqueue
 
 import webapp2
 
+import event
+
+
 PERIOD_MAP = {
     0: 'o',
     4: 'y',
@@ -91,8 +94,12 @@ class WorkBatcherHandler(webapp2.RequestHandler):
         )
 
         # Process the work we've got.
-        apply_work(work)
+        namespace, stat_models = apply_work(work)
         queue.delete_tasks(work)
+
+        models = [model.to_dict() for model in stat_models]
+
+        event.send("SUMMARY-%s" % namespace, models)
 
 
 @ndb.transactional
@@ -104,9 +111,9 @@ def apply_work(work):
     if not work:
         return
 
-    tag = work[0].tag
-
     stat_model_keys, payloads = _parse_work_tasks(work)
+
+    namespace = payloads[0]['namespace']
 
     root_stat_key = stat_model_keys[0]
 
@@ -142,7 +149,10 @@ def apply_work(work):
             model = _get_model(key, stat_models)
             _update_stats(model.stats, delta, new)
 
-    ndb.put_multi(stat_models.values())
+    stat_models = stat_models.values()
+    ndb.put_multi(stat_models)
+
+    return namespace, stat_models
 
 
 def _update_stats(stats, amount, new):
