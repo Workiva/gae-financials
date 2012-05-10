@@ -80,11 +80,9 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 
         el = @addView.render(false).el
         $("#add_area").html(el)
-            .find('input.date').focus()
 
         if @addView.focus_button
-            $("#add_area").html(el)
-                .find(@addView.focus_button).focus()
+            $("#add_area").find(@addView.focus_button).focus()
 
         $("#add_new").text('Search Mode')
 

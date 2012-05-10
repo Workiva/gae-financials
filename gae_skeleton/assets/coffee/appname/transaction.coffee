@@ -86,7 +86,6 @@ class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
                 })
         })
 
-        @$el.find("input.date").focus()
         return super(as_modal)
 
     save: =>
