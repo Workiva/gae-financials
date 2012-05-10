@@ -129,6 +129,9 @@ class Transaction(ndb.Model):
 
         if not transaction:
             transaction = cls()
+            transaction.is_new = True
+        else:
+            transaction.is_new = False
 
         transaction.date = cls.normalize_date_input(data.get('date'))
         transaction.vendor_name = data.get('vendor')
