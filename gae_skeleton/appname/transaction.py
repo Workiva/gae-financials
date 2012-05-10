@@ -119,7 +119,9 @@ class Transaction(ndb.Model):
     @classmethod
     def from_dict(cls, data):
         """Instantiate a Transaction entity from a dict of values."""
+        from string import maketrans
         from appname.vendor import Vendor
+        import decimal
 
         key = data.get('key')
         transaction = None
@@ -137,9 +139,16 @@ class Transaction(ndb.Model):
         transaction.vendor_name = data.get('vendor')
 
         # TODO: Use Python Decimal here with prec set to .00.
-        transaction.amount = data.get('amount')
+        translation_table = maketrans("", "")
+        amount = data.get('ammount', "0").translate(translation_table, "$,")
+        try:
+            decimal.Decimal(amount)
+        except decimal.InvalidOperation:
+            amount = "NaN"
 
-        vendor_keyname = base64.b64encode(transaction.vendor_name)
+        transaction.amount = amount
+
+        vendor_keyname = base64.b64encode(transaction.vendor_name.lower())
         vendor = Vendor.get_by_id(vendor_keyname)
         if vendor:
             transaction.tags = vendor.tags
