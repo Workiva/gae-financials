@@ -17,7 +17,7 @@ limitations under the License.
 Backbone.View.prototype.close = (() ->
     this.remove()
     this.unbind()
-    this.trigger('closing')
+    App.Appname.Events.trigger('closing', this)
     this.off()
     if this.onClose
         this.onClose()
@@ -47,6 +47,7 @@ window.App = (() ->
                 Models: {}
                 Collections: {}
                 Views: {}
+                Events: _.extend({}, Backbone.Events)
             }
     )()
 )()

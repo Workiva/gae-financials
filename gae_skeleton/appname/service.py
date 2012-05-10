@@ -33,7 +33,7 @@ class PersonHandler(webapp2.RequestHandler):
         user_query = self.request.get('query')
         limit = int(self.request.get('limit', 10))
 
-        query = Person.query()
+        query = Person.query(namespace="")
         if user_query:
             search = user_query.strip().lower()
             query = query.filter(Person.n_ >= search)
@@ -53,7 +53,7 @@ class PersonHandler(webapp2.RequestHandler):
             return
 
         key = ndb.Key(urlsafe=urlsafe)
-        if key.kind != Person._get_kind():
+        if key.kind() != Person._get_kind():
             self.error(500)
             return
 
@@ -112,7 +112,7 @@ class VendorHandler(webapp2.RequestHandler):
             return
 
         key = ndb.Key(urlsafe=urlsafe)
-        if key.kind != Vendor._get_kind():
+        if key.kind() != Vendor._get_kind():
             self.error(500)
             return
 
@@ -166,7 +166,7 @@ class TransactionHandler(webapp2.RequestHandler):
             return
 
         key = ndb.Key(urlsafe=urlsafe)
-        if key.kind != Transaction._get_kind():
+        if key.kind() != Transaction._get_kind():
             self.error(500)
             return
 

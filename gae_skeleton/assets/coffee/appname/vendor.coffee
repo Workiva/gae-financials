@@ -42,80 +42,20 @@ class App.Appname.Models.Vendor extends Backbone.Model
         if hasError
             return errors
 
-    clear: =>
-        @destroy()
-
 
 class App.Appname.Collections.VendorList extends Backbone.Collection
     url: '/service/vendor'
     model: App.Appname.Models.Vendor
 
 
-class App.Appname.Views.VendorApp extends App.Appname.Views.App
-    template: JST['vendor/view']
-    addView: null
-    listView: null
-
-    render: =>
-        @$el.html(@template())
-
-        @listView = new App.Appname.Views.ListApp(
-            'VendorList', @$("#vendorlist"))
-        @addView = new App.Appname.Views.AddApp(
-            App.Appname.Models.Vendor, App.Appname.Views.VendorEdit)
-
-        @addView.on("addItem", @addVendor, this)
-
-        $("#add_new").focus()
-        return this
-
-    addVendor: (model) =>
-        @listView.addOne(model)
-
-    onClose: =>
-        @addView.close()
-        @listView.close()
-
-
-class App.Appname.Views.VendorList extends Backbone.View
-    template: JST['vendor/list']
-    tagName: "tr"
-    editView: null
-
-    events:
-        "click .edit-button": "edit"
-        "click .remove-button": "clear"
-
-    initialize: =>
-        @model.bind('change', @render, this)
-        @model.bind('destroy', @remove, this)
-
-    render: =>
-        @$el.html(@template(@model.toJSON()))
-        return this
-
-    edit: =>
-        @editView = new App.Appname.Views.VendorEdit({model: @model})
-        @editView.on("save", @save, this)
-        el = @editView.render(true).$el
-        el.modal('show')
-        el.find('input.code').focus()
-
-    save: (model) =>
-        @editView.$el.modal('hide')
-        @editView.close()
-
-    clear: =>
-        @model.clear()
-
-
-class App.Appname.Views.VendorEdit extends Backbone.View
+class App.Appname.Views.VendorEdit extends App.Appname.Views.EditView
     template: JST['vendor/edit']
-    tagName: "div"
+    modelType: App.Appname.Models.Vendor
 
     events:
         "click a.destroy": "clear"
         "click a.add_tag": "addTag"
+        "click .save": "save"
         "keypress .edit": "updateOnEnter"
         "click .remove-button": "clear"
         "hidden": "close"
@@ -123,16 +63,15 @@ class App.Appname.Views.VendorEdit extends Backbone.View
     render: (as_modal) =>
         el = @$el
         el.html(@template(@model.toJSON()))
+
         @model.tags.each((info, i) ->
             editView = new App.Appname.Views.TagEdit({model: info})
             el.find('fieldset.tags').append(editView.render().el)
         )
         if as_modal
             el.attr('class', 'modal')
-        return this
 
-    clear: =>
-        @model.clear()
+        return super(as_modal)
 
     save: =>
         @model.tags.each((tag) ->
@@ -142,7 +81,8 @@ class App.Appname.Views.VendorEdit extends Backbone.View
             name: @$('input.name').val()
             notes: $.trim(@$('textarea.notes').val())
         )
-        @trigger('save', @model)
+
+        super()
 
     addTag: () =>
         newModel = new @model.tags.model()
@@ -151,7 +91,14 @@ class App.Appname.Views.VendorEdit extends Backbone.View
         editView = new App.Appname.Views.TagEdit({model: newModel})
         @$el.find('fieldset.tags').append(editView.render().el)
 
-    updateOnEnter: (e) =>
-        if e.keyCode == 13
-            @save()
+
+class App.Appname.Views.VendorApp extends App.Appname.Views.ModelApp
+    template: JST['vendor/view']
+    modelType: App.Appname.Models.Vendor
+    form: App.Appname.Views.VendorEdit
+
+
+class App.Appname.Views.VendorList extends App.Appname.Views.ListView
+    template: JST['vendor/list']
+    modelType: App.Appname.Models.Vendor
 
