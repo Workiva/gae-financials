@@ -57,6 +57,7 @@ class App.Appname.Collections.TransactionList extends Backbone.Collection
 class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
     template: JST['transaction/edit']
     modelType: App.Appname.Models.Transaction
+    focus_button: 'input.date'
 
     events:
         "click a.destroy": "clear"
@@ -85,6 +86,7 @@ class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
                 })
         })
 
+        @$el.find("input.date").focus()
         return super(as_modal)
 
     save: =>

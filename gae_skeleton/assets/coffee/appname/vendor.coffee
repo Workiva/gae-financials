@@ -51,6 +51,7 @@ class App.Appname.Collections.VendorList extends Backbone.Collection
 class App.Appname.Views.VendorEdit extends App.Appname.Views.EditView
     template: JST['vendor/edit']
     modelType: App.Appname.Models.Vendor
+    focus_button: 'input.name'
 
     events:
         "click a.destroy": "clear"

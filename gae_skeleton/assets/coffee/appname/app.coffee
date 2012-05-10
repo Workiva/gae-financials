@@ -56,7 +56,8 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
         @editView = new @form({model: model})
         el = @editView.render(true).$el
         el.modal('show')
-        el.find('input.code').focus()
+        if @editView.focus_button
+            el.find(@editView.focus_button).focus()
 
     addItem: (model) =>
         @listView.addOne(model)
@@ -79,7 +80,11 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 
         el = @addView.render(false).el
         $("#add_area").html(el)
-            .find('input.code').focus()
+            .find('input.date').focus()
+
+        if @addView.focus_button
+            $("#add_area").html(el)
+                .find(@addView.focus_button).focus()
 
         $("#add_new").text('Search Mode')
 
@@ -119,6 +124,7 @@ class App.Appname.Views.EditView extends Backbone.View
     tagName: "div"
     modelType: null
     is_modal: false
+    focus_button: null
 
     clear: =>
         @model.clear()
