@@ -29,11 +29,20 @@ class App.Appname.Collections.ActivityList extends Backbone.Collection
     model: App.Appname.Models.Activity
 
 
+class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandlers
+    onopen: =>
+        console.log('open')
+
+
 class App.Appname.Views.ActivityApp extends App.Appname.Views.App
     template: JST['activity/view']
 
     render: =>
         @$el.html(@template())
+
+        channelapp = new App.Appname.Views.ChannelApp()
+        handler = new App.Appname.Views.ActivityHandler()
+        channelapp.setupChannel(handler)
 
         return this
 
