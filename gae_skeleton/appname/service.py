@@ -233,12 +233,24 @@ class TransactionHandler(webapp2.RequestHandler):
 
 class TransactionSpreadsheetHandler(webapp2.RequestHandler):
     def get(self):
-        from appname.transaction import Transaction, get_transactions_from_google_spreadsheet
-        import datetime
+        from google.appengine.ext import ndb
+
+        from appname.transaction import Transaction
+        from appname.transaction import get_transactions_from_google_spreadsheet
+
         data = get_transactions_from_google_spreadsheet()
-        logging.info(data)
+        #logging.info(data)
+        transactions = []
         for d in data:
-            Transaction(date=datetime.datetime.strptime(d[0], '%d/%m/%Y'), vendor_name=d[1], amount=d[2]).put()
+            transaction_data = {
+                'date': d[0],
+                'vendor': d[1],
+                'amount': d[2]
+            }
+            transactions.append(Transaction.from_dict(transaction_data))
+
+        if transactions:
+            ndb.put_multi(transactions)
 
 class ChannelTokenHandler(webapp2.RequestHandler):
 

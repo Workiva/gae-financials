@@ -88,7 +88,6 @@ class Transaction(ndb.Model):
 
     @classmethod
     def normalize_date_input(cls, input):
-        from time import mktime
         from datetime import datetime
         import parsedatetime.parsedatetime as pdt
 
@@ -109,6 +108,7 @@ class Transaction(ndb.Model):
         if dt is None:
             try:
                 dt = c.parseDate(input)
+                dt = datetime(*dt[:6])
             except ValueError:
                 dt = None
 

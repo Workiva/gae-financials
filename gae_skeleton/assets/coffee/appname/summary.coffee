@@ -90,7 +90,7 @@ class App.Appname.Collections.SummaryList extends Backbone.Collection
     initialize: ->
         handler = new App.Appname.Views.SummaryChannelHandlers()
         handler.setCollection(this)
-        handler.setPeriodType(this)
+        handler.setPeriodType('d')
         channelapp = new App.Appname.Views.ChannelApp()
         channelapp.setupChannel(handler)
 
@@ -107,8 +107,6 @@ class App.Appname.Views.SummaryApp extends App.Appname.Views.ModelApp
         App.Appname.Events.trigger("period:change", period_type, this)
         @listView.collection.each((model) ->
             model.trigger('destroy')
-            # Does this actually free up the memory?
-            delete model
         )
         @listView.collection.fetch({data: {period: period_type}})
 
