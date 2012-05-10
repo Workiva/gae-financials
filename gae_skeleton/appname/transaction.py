@@ -63,7 +63,7 @@ class Transaction(ndb.Model):
 
         work = []
         for tag_data in self.tags:
-            tag = tag_data['name']
+            tag = tag_data['name'].lower()
             task_name = "%s_%s_%s" % (tag, self.key.urlsafe(), self.revision)
             work.append(taskqueue.Task(
                 method='PULL',
