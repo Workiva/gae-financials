@@ -42,6 +42,20 @@ from webassets.script import CommandLineEnvironment
 INPUT_FILES = path.join(os.getcwdu(), 'assets')
 OUTPUT_FILES = path.join(os.getcwdu(), 'static')
 
+
+
+def _bundle_images(env):
+    """Push images into static."""
+    #TODO: add png crush or something similar
+
+    import shutil
+    try:
+        shutil.rmtree(path.join(OUTPUT_FILES, 'img'))
+    except:
+        pass
+    shutil.copytree(path.join(INPUT_FILES, 'img'), path.join(OUTPUT_FILES, 'img'))
+
+
 def _bundle_app_coffee(env, debug=False):
     """Compile the apps coffeescript and bundle it into appname.js"""
     COFFEE_PATH = 'coffee'
@@ -166,6 +180,9 @@ def _setup_env(debug=True, cache=True):
     #css
     _bundle_app_less(env, debug)
     _bundle_3rd_party_css(env, debug)
+
+    #images
+    _bundle_images(env)
 
     return env
 
