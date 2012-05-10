@@ -72,12 +72,16 @@ class Transaction(ndb.Model):
                 payload=json.dumps({
                     'entity': self.key.urlsafe(),
                     'rev': self.revision,
-                    'date': self.date.strftime('%Y%m%d%H:%M'),
+                    'date': self.date.strftime('%Y%m%d%H%M'),
                     'amount': self.amount,
                     'namespace': namespace_manager.get_namespace()
                 }),
             ))
         taskqueue.Queue(name='work-groups').add(work)
+        taskqueue.add(
+            queue_name='default',
+            url='/_ah/task/batcher'
+        )
 
     @classmethod
     def from_dict(cls, data):
