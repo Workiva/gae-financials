@@ -61,6 +61,7 @@ def _bundle_app_coffee(env, debug=False):
     COFFEE_PATH = 'coffee'
     APP_PATH = path.join(COFFEE_PATH, 'appname')
     scripts = (
+        path.join(COFFEE_PATH, 'config.coffee'),
         path.join(COFFEE_PATH, 'nested.coffee'),
         path.join(COFFEE_PATH, 'app.coffee'),
         path.join(APP_PATH, 'app.coffee'),
@@ -173,6 +174,11 @@ def _bundle_app_less(env, debug):
 
 def _setup_env(debug=True, cache=True):
     """Setup the webassets environment."""
+    js_file = path.join(INPUT_FILES, 'coffee', 'config.coffee')
+    import settings
+    with open(js_file, "a") as myfile:
+        myfile.write("CLOUD_API_KEY='%s';\n" % (settings.CLOUD_API_KEY,))
+
     env = Environment(INPUT_FILES, OUTPUT_FILES)
     # We use underscore's templates by default.
     env.config['JST_COMPILER'] = '_.template'

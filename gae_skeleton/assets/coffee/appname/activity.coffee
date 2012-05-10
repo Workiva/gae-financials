@@ -30,30 +30,27 @@ class App.Appname.Collections.ActivityList extends Backbone.Collection
 
 
 class App.Appname.Views.ActivityApp extends App.Appname.Views.App
+    template: JST['activity/view']
 
     render: =>
-        @$el.html('activity')
-        #@$el.css('height', '500px')
+        @$el.html(@template())
+        map = new L.Map(this.$("#map").get(0))
 
-        #map = new L.Map(@el)
-
-        #api_key = ''
-
-        #cloud = new L.TileLayer(
-            #'http://{s}.tile.cloudmade.com/' + api_key + '/997/256/{z}/{x}/{y}.png',
-            #{
-                #attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-                #maxZoom: 18
-            #})
-        #map.setView(new L.LatLng(51.505, -0.09), 13)
-            #.addLayer(cloud)
+        cloud = new L.TileLayer(
+            'http://{s}.tile.cloudmade.com/' + CLOUD_API_KEY + '/997/256/{z}/{x}/{y}.png',
+            {
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+                maxZoom: 18
+            })
+        map.setView(new L.LatLng('51.505', '-0.09'), 13)
+            .addLayer(cloud)
 
         #channelapp = new App.Appname.Views.ChannelApp()
         #channelapp.setupChannel()
 
         return this
 
-    #onClose: =>
-        #@$el.html('')
-        #chanelapp.
-
+    #close: =>
+        #@$el.unbind()
+        #@$el.empty()
+        #console.log('close')

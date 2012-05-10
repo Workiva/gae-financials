@@ -21,6 +21,7 @@ import sys
 
 from fabric.api import local
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join('lib', 'local', 'scripts'))
 
 
