@@ -27,15 +27,6 @@ class App.Appname.Models.Activity extends Backbone.Model
 class App.Appname.Collections.ActivityList extends Backbone.Collection
     url: '/service/activity'
     model: App.Appname.Models.Activity
-    maxSize: 3
-
-    initialize: ->
-        @.on('add', @checkSize)
-
-    checkSize: ->
-        console.log(@checksize)
-        if @length > @maxSize
-            @models = @models.slice(-@maxSize)
 
 
 class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandlers
@@ -43,6 +34,9 @@ class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandler
 
     onmessage: (message) =>
         for message in JSON.parse(message.data).messages
+            if @startsWith(message.what, 'Summaries')
+                continue
+
             m = new App.Appname.Models.Activity(message)
             @listView.addOne(m)
 
