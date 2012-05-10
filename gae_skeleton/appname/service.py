@@ -33,7 +33,7 @@ class PersonHandler(webapp2.RequestHandler):
     def get(self):
         from appname.person import Person
         user_query = self.request.get('query')
-        limit = int(self.request.get('limit', 40))
+        limit = int(self.request.get('limit', 500))
 
         query = Person.query(namespace="")
         if user_query:
