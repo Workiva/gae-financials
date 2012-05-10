@@ -99,7 +99,7 @@ class Person(ndb.Model):
 def initilize_person(headers):
     from google.appengine.api import users
     user = users.get_current_user()
-    person = ndb.Key(Person, user.user_id(), namespace="")
+    person = ndb.Key(Person, user.user_id(), namespace="").get()
     if not person:
         person_key = ndb.Key(Person, user.user_id(), namespace="")
         person = Person(key=person_key, name=user.nickname())
