@@ -31,6 +31,7 @@
         <script type="application/javascript" src="/static/script/appname.js"></script>
         <script type="text/javascript" src="/_ah/channel/jsapi"></script>
         <script type="text/javascript">
+        CLOUD_API_KEY = "${CLOUD_API_KEY}";
         $(function(){
             var appname = new App.Appname.Router
             Backbone.history.start();
