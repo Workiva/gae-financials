@@ -40,6 +40,10 @@ class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandler
             m = new App.Appname.Models.Activity(message)
             @listView.addOne(m)
 
+    startsWith: (str, starts) ->
+        str = '' + str
+        starts = '' + starts
+        return str.length >= starts.length and str.substr(0, starts.length) == starts
 
 class App.Appname.Views.ActivityList extends App.Appname.Views.ListView
     template: JST['activity/list']
