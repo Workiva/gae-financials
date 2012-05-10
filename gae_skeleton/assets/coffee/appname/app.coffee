@@ -113,9 +113,24 @@ class App.Appname.Views.ModelApp extends App.Appname.Views.App
 class App.Appname.Views.EditView extends Backbone.View
     tagName: "div"
     modelType: null
+    is_modal: false
 
     clear: =>
         @model.clear()
+
+    render: (as_modal) =>
+        header = this.$("#editheader")
+
+        if as_modal
+            @$el.attr('class', 'modal')
+
+            this.$("#editheadercontainer").prepend(
+                $("<button class='close' data-dismiss='modal'>&times;</button>"))
+            header.html("Edit " + header.text())
+        else
+            header.html("Add " + header.text())
+
+        return this
 
     save: =>
         App.Appname.Events.trigger(@modelType.name + ':save', @model, this)

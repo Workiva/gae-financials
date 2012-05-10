@@ -80,9 +80,8 @@ class App.Appname.Views.PersonEdit extends App.Appname.Views.EditView
             editView = new App.Appname.Views.ContactInfoEdit({model: info})
             el.find('fieldset.contact_info').append(editView.render().el)
         )
-        if as_modal
-            el.attr('class', 'modal')
-        return this
+
+        return super(as_modal)
 
     addContactInfo: () =>
         newModel = new @model.contact_info.model()
