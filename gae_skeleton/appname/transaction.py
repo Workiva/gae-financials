@@ -61,6 +61,8 @@ class Transaction(ndb.Model):
         if not self.tags:
             return
 
+        # TODO:  Note that deletions and changes of day will result in
+        # over counting.  A reversing entry needs made for those items.
         work = []
         for tag_data in self.tags:
             tag = tag_data['name'].lower()
