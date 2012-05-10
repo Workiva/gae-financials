@@ -8,7 +8,7 @@ Dependencies
 - Pip (2.7)
 - Google Appengine SDK
   - You will also need to add the sdk to your python path.
-    - For example on OSX you could create a path file in your python 2.7 site-packages directory ::
+  - For example on OSX you could create a path file in your python 2.7 site-packages directory ::
 
     $ echo /usr/local/google_appengine >> gae.pth
 
@@ -39,7 +39,7 @@ Development
 
 Lets work. Go to your appdirectory (gae_skeleton here) ::
 
-    $ cd age_skeleton
+    $ cd gae_skeleton
 
 Once everything is installed you can now compile the app and go into dev watch mode.
 - In this mode you can edit your coffeescript and less files and it will auto compile them for you for easy development. ::
