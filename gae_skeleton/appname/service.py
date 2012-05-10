@@ -217,6 +217,8 @@ class SummaryHandler(webapp2.RequestHandler):
             query = query.filter(TagStats.tag == search_tag)
 
         # Default to finding days.
+        if not period:
+            period = 'd'
         query = query.filter(TagStats.period_type == period)
 
         # Cap the maximum at 1000
