@@ -40,8 +40,9 @@ class Main(webapp2.RequestHandler):
         person.initilize_person(self.request.headers)
 
         try:
+            import settings
             template = Template(filename='templates/base.mako')
-            out = template.render()
+            out = template.render(CLOUD_API_KEY=settings.CLOUD_API_KEY)
         except:
             out = exceptions.html_error_template().render()
             logging.exception('Oh NO! Rendering error.')
