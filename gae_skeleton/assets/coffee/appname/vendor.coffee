@@ -42,9 +42,6 @@ class App.Appname.Models.Vendor extends Backbone.Model
         if hasError
             return errors
 
-    clear: =>
-        @destroy()
-
 
 class App.Appname.Collections.VendorList extends Backbone.Collection
     url: '/service/vendor'

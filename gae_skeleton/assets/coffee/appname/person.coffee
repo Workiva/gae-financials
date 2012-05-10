@@ -42,9 +42,6 @@ class App.Appname.Models.Person extends Backbone.Model
         if hasError
             return errors
 
-    clear: =>
-        @destroy()
-
 
 class App.Appname.Collections.PersonList extends Backbone.Collection
     url: '/service/person'
@@ -58,6 +55,7 @@ class App.Appname.Views.PersonEdit extends App.Appname.Views.EditView
     events:
         "click a.destroy": "clear"
         "click a.add_contact": "addContactInfo"
+        "click .save": "save"
         "keypress .edit": "updateOnEnter"
         "click .remove-button": "clear"
         "hidden": "close"
