@@ -95,10 +95,14 @@ def process_events(name):
 
             return
 
-        try:
-            dispatch_events(name, *events)
-        except Exception:
-            logging.exception('Attempting to dispatch %r' % (events,))
+        batch_size = 5
+        while events:
+            send_group = events[:batch_size]
+            events = events[batch_size:]
+            try:
+                dispatch_events(name, *send_group)
+            except Exception:
+                logging.exception('Attempting to dispatch %r' % (send_group,))
 
         memcache.set(lock_key, 1, time=LOCK_TIMEOUT, namespace=MEMCACHE_NS)
         memcache.set(tail_key, new_head, namespace=MEMCACHE_NS)
