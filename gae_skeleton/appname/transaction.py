@@ -119,7 +119,6 @@ class Transaction(ndb.Model):
     @classmethod
     def from_dict(cls, data):
         """Instantiate a Transaction entity from a dict of values."""
-        from string import maketrans
         from appname.vendor import Vendor
         import decimal
 
@@ -139,8 +138,7 @@ class Transaction(ndb.Model):
         transaction.vendor_name = data.get('vendor')
 
         # TODO: Use Python Decimal here with prec set to .00.
-        translation_table = maketrans("", "")
-        amount = data.get('amount', "0").translate(translation_table, "$,")
+        amount = str(data.get('amount', "0")).translate(None, "$,")
         try:
             decimal.Decimal(amount)
         except decimal.InvalidOperation:
