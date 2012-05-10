@@ -45,24 +45,72 @@ class App.Appname.Models.Summary extends Backbone.Model
             return errors
 
 
+
+class App.Appname.Views.SummaryChannelHandlers extends App.Appname.Views.ChannelHandlers
+
+    constructor: (@collection, @periodType) ->
+        App.Appname.Events.bind("period:change", @setPeriodType)
+
+    setCollection: (collection) =>
+        @collection = collection
+
+    setPeriodType: (periodType) =>
+        @periodType = periodType
+
+    startsWith: (str, starts) ->
+        str = '' + str
+        starts = '' + starts
+        return str.length >= starts.length and str.substr(0, starts.length) == starts
+
+    onmessage: (messages) =>
+        messages = JSON.parse(messages.data)
+        to_add = []
+        for message in messages.messages
+            if not @startsWith(message.what, 'Summaries')
+                continue
+
+            for summary in message.summaries
+                if summary.period_type != @periodType
+                    continue
+
+                model = @collection.get(summary.key)
+                if model
+                    model.set(summary)
+                else
+                    to_add.push(summary)
+
+        if to_add.length
+            @collection.add(to_add)
+
+
 class App.Appname.Collections.SummaryList extends Backbone.Collection
     url: '/service/summary'
     model: App.Appname.Models.Summary
+
+    initialize: ->
+        handler = new App.Appname.Views.SummaryChannelHandlers()
+        handler.setCollection(this)
+        handler.setPeriodType(this)
+        channelapp = new App.Appname.Views.ChannelApp()
+        channelapp.setupChannel(handler)
 
 
 class App.Appname.Views.SummaryApp extends App.Appname.Views.ModelApp
     template: JST['summary/view']
     modelType: App.Appname.Models.Summary
 
-    initialize: ->
-        channelapp = new App.Appname.Views.ChannelApp()
-        channelapp.setupChannel(new App.Appname.Views.SummaryChannelHandlers)
+    events:
+        "change #period_type": "updatePeriodType"
 
-
-class App.Appname.Views.SummaryChannelHandlers extends App.Appname.Views.ChannelHandlers
-
-    onmessage: (message) =>
-        alert(message)
+    updatePeriodType: ->
+        period_type = @$("#period_type").val()
+        App.Appname.Events.trigger("period:change", period_type, this)
+        @listView.collection.each((model) ->
+            model.trigger('destroy')
+            # Does this actually free up the memory?
+            delete model
+        )
+        @listView.collection.fetch({data: {period: period_type}})
 
 
 class App.Appname.Views.SummaryList extends App.Appname.Views.ListView
