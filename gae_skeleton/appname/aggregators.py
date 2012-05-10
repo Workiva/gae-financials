@@ -123,7 +123,8 @@ def apply_work(work):
         check_model = _get_model(check_model_key, stat_models)
 
         entity_key = ndb.Key(urlsafe=unit['entity'])
-        last_rev, value = check_model.index.get(entity_key.id(), (None, '0'))
+        entity_id = unicode(entity_key.id())
+        last_rev, value = check_model.index.get(entity_id, (None, '0'))
         if last_rev >= unit.get('rev', 0):
             continue
 
@@ -131,7 +132,7 @@ def apply_work(work):
         if last_rev is None:
             new = True
 
-        check_model.index[entity_key.id()] = (unit['rev'], str(amount))
+        check_model.index[entity_id] = (unit['rev'], str(amount))
         delta = amount - Decimal(value)
 
         _update_stats(root_model.stats, delta, new)
