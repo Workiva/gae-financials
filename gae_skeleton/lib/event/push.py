@@ -22,8 +22,6 @@ def dispatch_events(name, *events):
 
         return
 
-    del payloads
-
     deferred.defer(push_message, name, '{"messages": [%s]}' % ','.join(payloads))
 
 
