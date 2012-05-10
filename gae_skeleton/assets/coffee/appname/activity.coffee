@@ -27,6 +27,15 @@ class App.Appname.Models.Activity extends Backbone.Model
 class App.Appname.Collections.ActivityList extends Backbone.Collection
     url: '/service/activity'
     model: App.Appname.Models.Activity
+    maxSize: 3
+
+    initialize: ->
+        @.on('add', @checkSize)
+
+    checkSize: ->
+        console.log(@checksize)
+        if @length > @maxSize
+            @models = @models.slice(-@maxSize)
 
 
 class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandlers
@@ -43,20 +52,30 @@ class App.Appname.Views.ActivityList extends App.Appname.Views.ListView
     modelType: App.Appname.Models.Activity
 
 
+class App.Appname.Views.ActivityListApp extends App.Appname.Views.ListApp
+
+    initialize: ->
+        super('ActivityList', @$("#Activitylist"))
+
+    addOne: (object) =>
+        view = new @model_view({model: object})
+        object.view = view
+        @el.prepend(view.render().el)
+        if @el.children().length > 25
+            @el.children().last().remove()
+
+
 class App.Appname.Views.ActivityApp extends App.Appname.Views.App
     template: JST['activity/view']
 
     render: =>
         @$el.html(@template())
 
-        @listView = new App.Appname.Views.ListApp(
-            'ActivityList', @$("#Activitylist"))
+        @listView = new App.Appname.Views.ActivityListApp()
 
         channelapp = new App.Appname.Views.ChannelApp()
         handler = new App.Appname.Views.ActivityHandler(@listView)
         channelapp.setupChannel(handler)
-
-        @listView.addOne(m)
 
         return this
 
