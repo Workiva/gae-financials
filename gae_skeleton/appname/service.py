@@ -33,7 +33,7 @@ class PersonHandler(webapp2.RequestHandler):
         user_query = self.request.get('query')
         limit = int(self.request.get('limit', 10))
 
-        query = Person.query()
+        query = Person.query(namespace="")
         if user_query:
             search = user_query.strip().lower()
             query = query.filter(Person.n_ >= search)

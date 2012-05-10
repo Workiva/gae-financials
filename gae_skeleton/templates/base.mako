@@ -21,6 +21,10 @@
             <div id="appnamecontainer" class="container">
                 <div id="appnameapp"></div>
             </div>
+            <div class="push"></div>
+        </div>
+        <div class="footer">
+            <center><i class="icon-right-hand"></i><strong>View the source at:</strong> <a href="https://github.com/robertkluin-wf/gae-financials">https://github.com/robertkluin-wf/gae-financials</a></center>
         </div>
         <script type="application/javascript" src="/static/script/libs.js"></script>
         <script type="application/javascript" src="/static/script/template.js"></script>

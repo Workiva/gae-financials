@@ -17,7 +17,9 @@
 
 """Transaction model definition and business logic."""
 
+import base64
 from google.appengine.ext import ndb
+import logging
 
 transaction_schema = {
     'key': basestring,
@@ -40,7 +42,7 @@ class Transaction(ndb.Model):
 
     # Transaction date
     date = ndb.DateTimeProperty('d', indexed=False)
-    vendor = ndb.StringProperty('v', indexed=False)
+    vendor_name = ndb.StringProperty('v', indexed=False)
     amount = ndb.StringProperty('a', indexed=False)
     #v_ = ndb.ComputedProperty(lambda self: self.vendor.lower())
 
@@ -74,6 +76,37 @@ class Transaction(ndb.Model):
         taskqueue.Queue(name='work-groups').add(work)
 
     @classmethod
+    def normalize_date_input(cls, input):
+        from time import mktime
+        from datetime import datetime
+        import parsedatetime.parsedatetime as pdt
+
+        c = pdt.Calendar()
+        result, what = c.parse(input)
+
+        dt = None
+
+        # what was returned (see http://code-bear.com/code/parsedatetime/docs/)
+        # 0 = failed to parse
+        # 1 = date (with current time, as a struct_time)
+        # 2 = time (with current date, as a struct_time)
+        # 3 = datetime
+        if what in (1,2,3):
+            # result is struct_time
+            dt = datetime(*result[:6])
+
+        if dt is None:
+            try:
+                dt = c.parseDate(input)
+            except ValueError:
+                dt = None
+
+        logging.info(dt)
+        return dt
+
+
+
+    @classmethod
     def from_dict(cls, data):
         """Instantiate a Transaction entity from a dict of values."""
         from datetime import datetime
@@ -89,13 +122,14 @@ class Transaction(ndb.Model):
             transaction = cls()
 
         # TODO: Fix date processing.
-        transaction.date = datetime.strptime(data.get('date'), '%m/%d/%Y')
-        transaction.vendor = data.get('vendor')
+        transaction.date = cls.normalize_date_input(data.get('date'))
+        transaction.vendor_name = data.get('vendor')
 
         # TODO: Use Python Decimal here with prec set to .00.
         transaction.amount = data.get('amount')
 
-        vendor = Vendor.get_by_id(transaction.vendor)
+        vendor_keyname = base64.b64encode(transaction.vendor_name)
+        vendor = Vendor.get_by_id(vendor_keyname)
         if vendor:
             transaction.tags = vendor.tags
 
@@ -113,13 +147,24 @@ class Transaction(ndb.Model):
             'modified': self.modified.strftime('%Y-%m-%d %h:%M'),
 
             # date
-            'date': self.date.strftime('%m/%d/%Y'),
+            'date': self.date.strftime('%m/%d/%Y %H:%M') if self.date is not None else "Bad Date",
 
             # vendor
-            'vendor': self.vendor,
+            'vendor': self.vendor_name,
 
             # amount
             'amount': self.amount,
         }
         return transaction
 
+def get_transactions_from_google_spreadsheet():
+    import gdata.spreadsheet.service
+    client = gdata.spreadsheet.service.SpreadsheetsService()
+    key = '0Ahivi2ybuZeydGRjakJzeWFSMTJyb0t4UnFqVlRuNXc'
+    rows = client.GetListFeed(key, visibility='public', projection='basic').entry
+    ret = []
+    for row in rows:
+        # FIXME: do not put ',' or ':' in the spreadsheet
+        cols = [cell.strip().split(': ')[1] for cell in row.content.text.split(', ')]
+        ret.append(cols)
+    return ret

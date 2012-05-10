@@ -34,6 +34,11 @@ from mako.template import Template
 
 class Main(webapp2.RequestHandler):
     def get(self):
+
+        from appname import person
+        # we check and create a Person if you login to this app
+        person.initilize_person(self.request)
+
         try:
             template = Template(filename='templates/base.mako')
             out = template.render()

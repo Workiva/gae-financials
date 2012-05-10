@@ -1,28 +1,35 @@
 <form class="edit containter-fluid well form-horizontal">
     <div class="row-fluid">
-        <fieldset>
-            <div class="control-group">
-                <label for="name" class="control-label">Name:</label>
-                <div class="control">
-                    <input type="text" value="<%= name %>" id="name" class="name" placeholder="Name..." />
+        <div id="editheadercontainer" class="modal-header">
+            <h3 id="editheader">Vendor<h3>
+        </div>
+        <div class="modal-body">
+            <fieldset>
+                <div class="control-group">
+                    <label for="name" class="control-label">Name:</label>
+                    <div class="control">
+                        <input type="text" value="<%= name %>" id="name" class="name" placeholder="Name..." />
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <div class="control">
-                    <fieldset class="tags">
-                        <legend>Tags:</legend>
-                    </fieldset>
-                    <br />
-                    <a class="add_tag btn-small btn-primary">add tag</a>
+                <div class="control-group">
+                    <div class="control">
+                        <fieldset class="tags">
+                            <legend>Tags:</legend>
+                        </fieldset>
+                        <br />
+                        <a class="add_tag btn-small btn-primary">add tag</a>
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <div class="control">
-                    <textarea class="notes input-xlarge" placeholder="Notes..."><%= notes %></textarea>
+                <div class="control-group">
+                    <div class="control">
+                        <textarea class="notes input-xlarge" placeholder="Notes..."><%= notes %></textarea>
+                    </div>
                 </div>
-            </div>
-        </fieldset>
-        <a class="save btn-small">Save</a>
-        <a class="destroy btn-small btn-danger">Delete</a>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <a class="save btn btn-primary">Save</a>
+            <a class="remove-button btn btn-danger">Clear</a>
+        </div>
     </div>
 </form>
