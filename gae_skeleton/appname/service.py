@@ -198,3 +198,33 @@ class TransactionHandler(webapp2.RequestHandler):
         out = transaction_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
+
+class SummaryHandler(webapp2.RequestHandler):
+    """The summary endpoint only supports read operations,
+    modification of the stats entities happens only through
+    the well-defined aggregation process.
+    """
+
+    def get(self):
+        from appname.aggregators import TagStats
+        tag = self.request.get('tag')
+        period = self.request.get('period')
+        limit = int(self.request.get('limit', 10))
+
+        query = TagStats.query()
+        if tag:
+            search_tag = tag.strip().lower()
+            query = query.filter(TagStats.tag == search_tag)
+
+        # Default to finding days.
+        query = query.filter(TagStats.period_type == period)
+
+        # Cap the maximum at 1000
+        if 0 < limit < 1000:
+            stats = query.fetch(limit)
+        else:
+            stats = query.fetch(1000)
+
+        out = [entity.to_dict() for entity in stats]
+        self.response.out.write(json.dumps(out))
+
