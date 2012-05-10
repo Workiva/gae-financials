@@ -48,9 +48,6 @@ class App.Appname.Models.Transaction extends Backbone.Model
         if hasError
             return errors
 
-    clear: =>
-        @destroy()
-
 
 class App.Appname.Collections.TransactionList extends Backbone.Collection
     url: '/service/transaction'
@@ -90,17 +87,11 @@ class App.Appname.Views.TransactionEdit extends App.Appname.Views.EditView
         return super(as_modal)
 
     save: =>
-        console.log(
-            date: @$('input.date').val()
-            vendor: @$('input.vendor').val()
-            amount: @$('input.amount').val()
-        )
         @model.save(
             date: @$('input.date').val()
             vendor: @$('input.vendor').val()
             amount: @$('input.amount').val()
         )
-        @trigger('save', @model)
 
         super()
 
