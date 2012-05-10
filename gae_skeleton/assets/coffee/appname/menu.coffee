@@ -45,9 +45,9 @@ class App.Appname.Views.Menu extends Backbone.View
     initialize: () ->
         items = [
             {
-                text: 'Person',
-                title: 'person',
-                href: '#\/person'
+                text: 'Activity',
+                title: 'activity',
+                href: '#\/activity'
             },
             {
                 text: 'Vendor',
@@ -58,11 +58,6 @@ class App.Appname.Views.Menu extends Backbone.View
                 text: 'Transaction',
                 title: 'transaction',
                 href: '#\/transaction'
-            },
-            {
-                text: 'Activity',
-                title: 'activity',
-                href: '#\/activity'
             },
         ]
         @collection = new App.Appname.Collections.MenuItems(items)
