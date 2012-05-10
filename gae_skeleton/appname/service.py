@@ -215,6 +215,14 @@ class TransactionHandler(webapp2.RequestHandler):
         out = transaction_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
+class TransactionSpreadsheetHandler(webapp2.RequestHandler):
+    def get(self):
+        from appname.transaction import Transaction, get_transactions_from_google_spreadsheet
+        import datetime
+        data = get_transactions_from_google_spreadsheet()
+        logging.info(data)
+        for d in data:
+            Transaction(date=datetime.datetime.strptime(d[0], '%d/%m/%Y'), vendor_name=d[1], amount=d[2]).put()
 
 class ChannelTokenHandler(webapp2.RequestHandler):
 
