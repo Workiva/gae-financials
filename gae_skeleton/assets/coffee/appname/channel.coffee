@@ -19,8 +19,6 @@ class App.Appname.Views.ChannelApp extends Backbone.View
                 console.log(data.token)
                 channel = new goog.appengine.Channel(data.token)
                 @socket = channel.open(handler)
-                @socket.onmessage = (message) ->
-                    alert(message)
                 window.S = @socket
         )
 
