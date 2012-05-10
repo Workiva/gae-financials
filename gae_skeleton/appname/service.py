@@ -23,8 +23,10 @@ it up into a package.
 
 import json
 import logging
-
+from google.appengine.api import users
 import webapp2
+import event
+from person import Person
 
 
 class PersonHandler(webapp2.RequestHandler):
@@ -195,6 +197,21 @@ class TransactionHandler(webapp2.RequestHandler):
         transaction_entity = Transaction.from_dict(transaction)
         transaction_entity.put()
 
+        user_id = users.get_current_user().user_id()
+        person = Person.get_by_id(user_id)
+        if transaction_entity.is_new:
+            what = "Transaction Created."
+        else:
+            what = "Transaction Updated."
+        what = "%s $%s at %s" % (what, transaction_entity.amount, transaction_entity.vendor_name)
+        loc = ""
+        if person is not None and person.location_info is not None:
+            loc = person.location_info.get('latlong')
+        message = {'location': loc,
+                    'what': what}
+        event.send("ACTIVITY", message)
+        logging.info("Sending message: %s" % message)
+
         out = transaction_entity.to_dict()
         self.response.out.write(json.dumps(out))
 
@@ -203,8 +220,7 @@ class ChannelTokenHandler(webapp2.RequestHandler):
 
     def get(self):
         from google.appengine.api import channel
-        from google.appengine.api import users
-        import event
+
 
         user_id = users.get_current_user().user_id()
         token = channel.create_channel(user_id)
@@ -251,3 +267,34 @@ class SummaryHandler(webapp2.RequestHandler):
         out = [entity.to_dict() for entity in stats]
         self.response.out.write(json.dumps(out))
 
+
+
+class ChannelConnectedHandler(webapp2.RequestHandler):
+    """
+    Called when a Channel has been connected.
+    """
+
+
+    def post(self):
+        import event
+
+        channel_id = self.request.get('from')
+
+        event.subscribe('ACTIVITY', channel_id)
+        event.subscribe('SUMMARY-%s' % channel_id, channel_id)
+
+
+
+class ChannelDisconnectedHandler(webapp2.RequestHandler):
+    """
+    Called when a Channel has been disconnected.
+    """
+
+
+    def post(self):
+        import event
+
+        channel_id = self.request.get('from')
+
+        event.unsubscribe('ACTIVITY', channel_id)
+        event.unsubscribe('SUMMARY-%s' % channel_id, channel_id)

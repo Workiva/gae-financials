@@ -35,6 +35,8 @@ url_map = [
     ('.*/transaction.*', 'appname.service.TransactionHandler'),
     ('.*/channel/token.*', 'appname.service.ChannelTokenHandler'),
     ('.*/summary.*', 'appname.service.SummaryHandler'),
+    ('/_ah/channel/connected/', 'appname.service.ChannelConnectedHandler'),
+    ('/_ah/channel/disconnected/', 'appname.service.ChannelDisconnectedHandler'),
 ]
 
 app = webapp2.WSGIApplication(url_map)
