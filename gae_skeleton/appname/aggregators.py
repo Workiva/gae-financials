@@ -35,6 +35,12 @@ PERIOD_MAP = {
 
 class TagStats(ndb.Model):
     """Stats about Tag entities."""
+    # Store the schema version, to aid in migrations.
+    version_ = ndb.IntegerProperty('v_', default=1)
+
+    # The entity's change revision counter.
+    revision = ndb.IntegerProperty('r_', default=0)
+
     period = ndb.StringProperty('p')
     period_type = ndb.ComputedProperty(
         lambda self: PERIOD_MAP.get(len(self.period), 'e'), name='pt')
@@ -43,6 +49,31 @@ class TagStats(ndb.Model):
 
     stats = ndb.JsonProperty('s')
     index = ndb.JsonProperty('i')
+
+    def _pre_put_hook(self):
+        """Ran before the entity is written to the datastore."""
+        self.revision += 1
+
+    def to_dict(self):
+        """Return a TagStats entity represented as a dict of values."""
+        tagstats = {
+            'version': self.version_,
+            'key': self.key.urlsafe(),
+            'revision': self.revision,
+
+            # tag
+            'tag': self.tag,
+
+            # period
+            'period': self.period,
+
+            # period type
+            'period_type': self.period_type,
+
+            # Stats
+            'stats': self.stats,
+        }
+        return tagstats
 
 
 class WorkBatcherHandler(webapp2.RequestHandler):
