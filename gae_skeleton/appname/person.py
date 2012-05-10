@@ -65,7 +65,7 @@ class Person(ndb.Model):
             person = key.get()
 
         if not person:
-            person = cls()
+            person = cls(namespace="")
 
         person.name = data.get('name')
         person.contact_info = data.get('contact_info')
@@ -83,7 +83,7 @@ class Person(ndb.Model):
             'revision': self.revision,
             'added': self.added.strftime('%Y-%m-%d %h:%M'),
             'modified': self.modified.strftime('%Y-%m-%d %h:%M'),
-            'latlong': self.location_info.get('latlong'),
+            'latlong': self.location_info.get('latlong') if self.location_info is not None else "",
 
             # name
             'name': self.name,
