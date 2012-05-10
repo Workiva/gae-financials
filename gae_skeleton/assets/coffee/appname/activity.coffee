@@ -34,6 +34,9 @@ class App.Appname.Views.ActivityHandler extends App.Appname.Views.ChannelHandler
 
     onmessage: (message) =>
         for message in JSON.parse(message.data).messages
+            if @startsWith(message.what, 'Summaries')
+                continue
+
             m = new App.Appname.Models.Activity(message)
             @listView.addOne(m)
 
@@ -43,20 +46,30 @@ class App.Appname.Views.ActivityList extends App.Appname.Views.ListView
     modelType: App.Appname.Models.Activity
 
 
+class App.Appname.Views.ActivityListApp extends App.Appname.Views.ListApp
+
+    initialize: ->
+        super('ActivityList', @$("#Activitylist"))
+
+    addOne: (object) =>
+        view = new @model_view({model: object})
+        object.view = view
+        @el.prepend(view.render().el)
+        if @el.children().length > 25
+            @el.children().last().remove()
+
+
 class App.Appname.Views.ActivityApp extends App.Appname.Views.App
     template: JST['activity/view']
 
     render: =>
         @$el.html(@template())
 
-        @listView = new App.Appname.Views.ListApp(
-            'ActivityList', @$("#Activitylist"))
+        @listView = new App.Appname.Views.ActivityListApp()
 
         channelapp = new App.Appname.Views.ChannelApp()
         handler = new App.Appname.Views.ActivityHandler(@listView)
         channelapp.setupChannel(handler)
-
-        @listView.addOne(m)
 
         return this
 
