@@ -150,7 +150,7 @@ class App.Appname.Views.ListView extends Backbone.View
 
     events:
         "click .edit-button": "edit"
-        "click .remove-button": "remove"
+        "click .remove-button": "delete"
 
     initialize: =>
         @model.bind('change', @render, this)
@@ -163,7 +163,7 @@ class App.Appname.Views.ListView extends Backbone.View
     edit: =>
         App.Appname.Events.trigger(@modelType.name + ":edit", @model, this)
 
-    remove: =>
+    delete: =>
         @model.destroy()
 
 
