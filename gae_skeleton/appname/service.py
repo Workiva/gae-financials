@@ -250,3 +250,4 @@ class SummaryHandler(webapp2.RequestHandler):
 
         out = [entity.to_dict() for entity in stats]
         self.response.out.write(json.dumps(out))
+

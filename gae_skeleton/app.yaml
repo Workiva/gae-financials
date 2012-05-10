@@ -21,7 +21,7 @@ handlers:
 
 - url: /_ah/task/.*
   script: task.app
-  login: required
+  login: admin
 
 - url: /service/.*
   script: service.app
