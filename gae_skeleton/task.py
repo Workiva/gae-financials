@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-"""Map service handlers here.  These might be exposed JSON endpoints."""
+"""Map task handlers here.  These will be protected task-urls."""
 
 import logging
 import os
@@ -30,11 +30,7 @@ if libs_dir not in sys.path:
 import webapp2
 
 url_map = [
-    ('.*/person.*', 'appname.service.PersonHandler'),
-    ('.*/vendor.*', 'appname.service.VendorHandler'),
-    ('.*/transaction.*', 'appname.service.TransactionHandler'),
-    ('.*/channel/token.*', 'appname.service.ChannelTokenHandler'),
-    ('.*/summary.*', 'appname.service.SummaryHandler'),
+    ('/_ah/task/batcher', 'appname.aggregators.WorkBatcherHandler'),
 ]
 
 app = webapp2.WSGIApplication(url_map)

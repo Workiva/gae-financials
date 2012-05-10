@@ -57,23 +57,34 @@ class Transaction(ndb.Model):
         """Ran after the entity is written to the datastore."""
         import json
         from google.appengine.api import taskqueue
+        from google.appengine.api import namespace_manager
 
         if not self.tags:
             return
 
+        # TODO:  Note that deletions and changes of day will result in
+        # over counting.  A reversing entry needs made for those items.
         work = []
-        for tag in self.tags:
-            task_name = "%s:%s:%s" % (tag, self.key.urlsafe, self.revision)
+        for tag_data in self.tags:
+            tag = tag_data['name'].lower()
+            task_name = "%s_%s_%s" % (tag, self.key.urlsafe(), self.revision)
             work.append(taskqueue.Task(
+                method='PULL',
                 name=task_name,
                 tag=tag,
                 payload=json.dumps({
-                    'entity': self.key.urlsafe,
+                    'entity': self.key.urlsafe(),
                     'rev': self.revision,
-                    'payload': self.amount
+                    'date': self.date.strftime('%Y%m%d%H%M'),
+                    'amount': self.amount,
+                    'namespace': namespace_manager.get_namespace()
                 }),
             ))
         taskqueue.Queue(name='work-groups').add(work)
+        taskqueue.add(
+            queue_name='default',
+            url='/_ah/task/batcher'
+        )
 
     @classmethod
     def normalize_date_input(cls, input):
@@ -108,7 +119,6 @@ class Transaction(ndb.Model):
     @classmethod
     def from_dict(cls, data):
         """Instantiate a Transaction entity from a dict of values."""
-        from datetime import datetime
         from appname.vendor import Vendor
 
         key = data.get('key')
@@ -120,7 +130,6 @@ class Transaction(ndb.Model):
         if not transaction:
             transaction = cls()
 
-        # TODO: Fix date processing.
         transaction.date = cls.normalize_date_input(data.get('date'))
         transaction.vendor_name = data.get('vendor')
 
