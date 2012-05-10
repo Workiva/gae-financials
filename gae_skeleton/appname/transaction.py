@@ -101,7 +101,6 @@ class Transaction(ndb.Model):
             except ValueError:
                 dt = None
 
-        logging.info(dt)
         return dt
 
 
