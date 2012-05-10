@@ -24,6 +24,7 @@ class App.Appname.Router extends Backbone.Router
         "person": "showPerson"
         "vendor": "showVendor"
         "transaction": "showTransaction"
+        "summary": "showSummary"
 
     initialize: (data) ->
         @menu = new App.Appname.Views.Menu()
@@ -47,4 +48,8 @@ class App.Appname.Router extends Backbone.Router
     showTransaction: () =>
         console.log('calling transaction')
         @swap(App.Appname.Views.TransactionApp)
+
+    showSummary: () =>
+        console.log('calling summary')
+        @swap(App.Appname.Views.SummaryApp)
 
