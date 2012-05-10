@@ -107,8 +107,6 @@ class App.Appname.Views.SummaryApp extends App.Appname.Views.ModelApp
         App.Appname.Events.trigger("period:change", period_type, this)
         @listView.collection.each((model) ->
             model.trigger('destroy')
-            # Does this actually free up the memory?
-            delete model
         )
         @listView.collection.fetch({data: {period: period_type}})
 
