@@ -34,10 +34,6 @@ handlers:
   script: service.app
   #login: required
 
-- url: /googlede443164daa0f24c.html
-  static_files: static/googlede443164daa0f24c.html
-  upload: static/googlede443164daa0f24c.html
-
 - url: .*
   script: main.app
   login: required
