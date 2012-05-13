@@ -178,7 +178,7 @@ class Transaction(ndb.Model):
 def get_transactions_from_google_spreadsheet():
     import gdata.spreadsheet.service
     client = gdata.spreadsheet.service.SpreadsheetsService()
-    key = '0Ahivi2ybuZeydGRjakJzeWFSMTJyb0t4UnFqVlRuNXc'
+    key = 'some_key_for_a_public_published_spreadsheet'
     rows = client.GetListFeed(key, visibility='public', projection='basic').entry
     ret = []
     for row in rows:
